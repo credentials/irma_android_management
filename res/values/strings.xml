@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">irma_android_management</string>
+    <string name="title_credential_detail">Credential Detail</string>
+
+</resources>

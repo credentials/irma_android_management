@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">irma_android_management</string>
+    <string name="app_name">IRMA Management</string>
     <string name="title_credential_detail">Credential Detail</string>
     <string name="irmalogo">IRMA Logo</string>
+    <string name="irmashape">GUI artifact</string>
+    <string name="issuerlogo">Issuer Logo</string>
+    
+    <string name="pinrequired">Pin required:</string>
+    <string name="validtill">Valid until:</string>
+    <string name="issuer">Issuer</string>
+    <string name="credentialdescription">Credential Description</string>
+    <string name="deletetext">Delete</string>
 
 </resources>

@@ -3,6 +3,7 @@ package org.irmacard.androidmanagement;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -72,8 +73,8 @@ public class CredentialListFragment extends ListFragment {
 
 		// TODO: replace with a real list adapter.
 		setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-				android.R.layout.simple_list_item_activated_1,
-				android.R.id.text1, DummyContent.ITEMS));
+				R.layout.list_item,
+				R.id.item_label, DummyContent.ITEMS));
 	}
 
 	@Override
@@ -86,6 +87,9 @@ public class CredentialListFragment extends ListFragment {
 			setActivatedPosition(savedInstanceState
 					.getInt(STATE_ACTIVATED_POSITION));
 		}
+
+		// Set list selector in code
+		getListView().setSelector(R.drawable.credential_list_selector);
 	}
 
 	@Override

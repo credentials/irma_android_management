@@ -3,5 +3,6 @@
 
     <string name="app_name">irma_android_management</string>
     <string name="title_credential_detail">Credential Detail</string>
+    <string name="irmalogo">IRMA Logo</string>
 
 </resources>

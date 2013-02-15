@@ -54,12 +54,10 @@ public class CredentialAttributeAdapter extends BaseAdapter {
 
 		TextView name = (TextView) view.findViewById(R.id.detail_attribute_name);
 		TextView value = (TextView) view.findViewById(R.id.detail_attribute_value);
-		TextView description = (TextView) view.findViewById(R.id.detail_attribute_desc);
 
 		AttributeDescription desc = attr_desc.get(position);
 		name.setText(desc.getName() + ":");
 		value.setText(new String(attr_vals.get(desc.getName())));
-		description.setText(desc.getDescription());
 
 		return view;
 	}

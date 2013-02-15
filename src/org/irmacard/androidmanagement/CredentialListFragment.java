@@ -88,8 +88,8 @@ public class CredentialListFragment extends ListFragment {
 					.getInt(STATE_ACTIVATED_POSITION));
 		}
 
-		// Set list selector in code
 		getListView().setSelector(R.drawable.credential_list_selector);
+		getListView().setDividerHeight(0);
 	}
 
 	@Override

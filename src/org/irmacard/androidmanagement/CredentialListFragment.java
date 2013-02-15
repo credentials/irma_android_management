@@ -1,5 +1,8 @@
 package org.irmacard.androidmanagement;
 
+import java.util.List;
+import java.util.Vector;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -9,6 +12,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import org.irmacard.androidmanagement.dummy.DummyContent;
+import org.irmacard.credentials.info.DescriptionStore;
+import org.irmacard.credentials.info.InfoException;
+import org.irmacard.credentials.info.CredentialDescription;
+
+import org.irmacard.androidmanagement.AndroidWalker;
 
 /**
  * A list fragment representing a list of Credentials. This fragment also
@@ -37,6 +45,8 @@ public class CredentialListFragment extends ListFragment {
 	 * The current activated item position. Only used on tablets.
 	 */
 	private int mActivatedPosition = ListView.INVALID_POSITION;
+	
+	private List<CredentialDescription> cred_desc = null;
 
 	/**
 	 * A callback interface that all activities containing this fragment must
@@ -47,7 +57,7 @@ public class CredentialListFragment extends ListFragment {
 		/**
 		 * Callback for when an item has been selected.
 		 */
-		public void onItemSelected(String id);
+		public void onItemSelected(short id);
 	}
 
 	/**
@@ -56,7 +66,7 @@ public class CredentialListFragment extends ListFragment {
 	 */
 	private static Callbacks sDummyCallbacks = new Callbacks() {
 		@Override
-		public void onItemSelected(String id) {
+		public void onItemSelected(short id) {
 		}
 	};
 
@@ -70,11 +80,26 @@ public class CredentialListFragment extends ListFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+	    AndroidWalker aw = new AndroidWalker(getResources().getAssets());
+	    DescriptionStore.setTreeWalker(aw);
+	    
+	    DescriptionStore descriptionStore = null;
+	    try {
+			descriptionStore = DescriptionStore.getInstance();
+		} catch (InfoException e) {
+			// TODO Auto-generated catch block
+			Log.e("error", "something went wrong");
+			e.printStackTrace();
+		}
 
-		// TODO: replace with a real list adapter.
-		setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-				R.layout.list_item,
-				R.id.item_label, DummyContent.ITEMS));
+		// TODO: fill with more appropriate data
+	    cred_desc = new Vector<CredentialDescription>();
+	    cred_desc.add(descriptionStore.getCredentialDescription((short) 1));
+	    cred_desc.add(descriptionStore.getCredentialDescription((short) 10));
+	    cred_desc.add(descriptionStore.getCredentialDescription((short) 100));
+
+	    setListAdapter(new CredentialListAdapter(getActivity(), cred_desc));
 	}
 
 	@Override
@@ -120,7 +145,7 @@ public class CredentialListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+		mCallbacks.onItemSelected(cred_desc.get(position).getId());
 	}
 
 	@Override

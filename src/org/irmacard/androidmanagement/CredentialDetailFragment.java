@@ -10,9 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+
 import org.irmacard.androidmanagement.dummy.DummyContent;
+import org.irmacard.androidmanagement.dummy.TestAttributes;
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.info.AttributeDescription;
+import org.irmacard.credentials.info.CredentialDescription;
+import org.irmacard.credentials.info.DescriptionStore;
+import org.irmacard.credentials.info.InfoException;
+import org.irmacard.credentials.info.IssuerDescription;
 
 /**
  * A fragment representing a single Credential detail screen. This fragment is
@@ -27,11 +34,7 @@ public class CredentialDetailFragment extends Fragment {
 	public static final String ARG_ITEM_ID = "item_id";
 	
 	CredentialAttributeAdapter mAdapter;
-
-	/**
-	 * The dummy content this fragment is presenting.
-	 */
-	private DummyContent.DummyItem mItem;
+	CredentialDescription cred_desc;
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -48,8 +51,15 @@ public class CredentialDetailFragment extends Fragment {
 			// Load the dummy content specified by the fragment
 			// arguments. In a real-world scenario, use a Loader
 			// to load content from a content provider.
-			mItem = DummyContent.ITEM_MAP.get(getArguments().getString(
-					ARG_ITEM_ID));
+			try {
+				DescriptionStore ds = DescriptionStore.getInstance();
+				cred_desc = ds
+					.getCredentialDescription(getArguments().getShort(
+							CredentialDetailFragment.ARG_ITEM_ID));
+			} catch (InfoException e) {
+				Log.e("cred_detail", "Couldn't retrieve DescriptionStore");
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -59,11 +69,11 @@ public class CredentialDetailFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.fragment_credential_detail,
 				container, false);
 
-		// Show the dummy content as text in a TextView.
-		if (mItem != null) {
-			List<AttributeDescription> attr_desc = TestData.getAttributeDescriptions();
-			Attributes attr_vals = TestData.getAttributes();
-			mAdapter = new CredentialAttributeAdapter(getActivity(), attr_desc, attr_vals);
+		if (cred_desc != null) {
+			List<AttributeDescription> attr_desc = cred_desc.getAttributes();
+			Attributes attr_vals = new TestAttributes();
+			mAdapter = new CredentialAttributeAdapter(getActivity(), attr_desc,
+					attr_vals);
 		}
 
 		return rootView;
@@ -72,9 +82,19 @@ public class CredentialDetailFragment extends Fragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		ListView list = (ListView) view
 				.findViewById(R.id.detail_attribute_list);
-		Log.i("blaat", list.toString());
-		//String[] bla = {"aap", "noot", "mies"};
-		//list.setAdapter(new ArrayAdapter<String>(view.getContext(), R.layout.row_attribute, R.id.detail_attribute_name, bla));
+		
+		TextView issuerName = (TextView) view.findViewById(R.id.detail_issuer_description_name);
+		TextView issuerAddress = (TextView) view.findViewById(R.id.detail_issuer_description_address);
+		TextView issuerEMail = (TextView) view.findViewById(R.id.detail_issuer_description_email);
+		TextView credentialDescription = (TextView) view.findViewById(R.id.detail_credential_desc_text);
+		
+		IssuerDescription issuer = cred_desc.getIssuerDescription();
+		issuerName.setText(issuer.getName());
+		issuerAddress.setText(issuer.getContactAddress());
+		issuerEMail.setText(issuer.getContactEMail());
+		
+		credentialDescription.setText(cred_desc.getDescription());
+		
 		list.setAdapter(mAdapter);
 	}
 }

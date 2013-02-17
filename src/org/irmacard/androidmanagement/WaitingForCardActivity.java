@@ -31,6 +31,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 public class WaitingForCardActivity extends Activity {
 	private NfcAdapter nfcA;
@@ -80,7 +82,7 @@ public class WaitingForCardActivity extends Activity {
         mTechLists = new String[][] { new String[] { IsoDep.class.getName() } };
         
         // Set initial state
-        activityState = STATE_IDLE;
+        setState(STATE_IDLE);
 	}
 
 	@Override
@@ -117,10 +119,35 @@ public class WaitingForCardActivity extends Activity {
     		
     		// Make sure we're not already communicating with a card
     		if (activityState != STATE_CHECKING) {
-    			activityState = STATE_CHECKING;
+    			setState(STATE_CHECKING);
 	    		new LoadCredentialsFromCardTask(this).execute(tag);
     		}
     	}    	
+    }
+    
+    public void setState(int state) {
+    	int imageResource = 0;
+    	int statusTextResource = 0;
+    	
+    	Log.i(TAG, "Changing status to " + state);
+    	
+    	switch(state) {
+    	case STATE_CHECKING:
+    		Log.i("TAG", "Changing status to Checking");
+    		imageResource = R.drawable.irma_icon_card_found_520px;
+    		statusTextResource = R.string.status_loading_credentials;
+    		break;
+    	case STATE_IDLE:
+    		Log.i("TAG", "Chainging status to IDLE");
+    		imageResource = R.drawable.irma_icon_place_card_520px;
+    		statusTextResource = R.string.status_waiting_for_card;
+    		break;
+    	}
+    	
+    	((TextView) findViewById(R.id.statustext)).setText(statusTextResource);
+    	((ImageView) findViewById(R.id.statusimage)).setImageResource(imageResource);
+    	
+    	activityState = state;
     }
     
     @Override

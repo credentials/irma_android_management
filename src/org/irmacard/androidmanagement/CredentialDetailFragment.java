@@ -1,6 +1,9 @@
 package org.irmacard.androidmanagement;
 
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import android.os.Bundle;
@@ -16,6 +19,8 @@ import android.widget.TextView;
 import org.irmacard.androidmanagement.dummy.DummyContent;
 import org.irmacard.androidmanagement.dummy.TestAttributes;
 import org.irmacard.credentials.Attributes;
+import org.irmacard.credentials.CredentialsException;
+import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.info.AttributeDescription;
 import org.irmacard.credentials.info.CredentialDescription;
 import org.irmacard.credentials.info.DescriptionStore;
@@ -89,11 +94,31 @@ public class CredentialDetailFragment extends Fragment {
 		TextView issuerAddress = (TextView) view.findViewById(R.id.detail_issuer_description_address);
 		TextView issuerEMail = (TextView) view.findViewById(R.id.detail_issuer_description_email);
 		TextView credentialDescription = (TextView) view.findViewById(R.id.detail_credential_desc_text);
+		TextView validityValue = (TextView) view.findViewById(R.id.detail_validity_value);
+		TextView validityRemaining = (TextView) view.findViewById(R.id.detail_validity_remaining);
 		
 		IssuerDescription issuer = credential.getCredentialDescription().getIssuerDescription();
 		issuerName.setText(issuer.getName());
 		issuerAddress.setText(issuer.getContactAddress());
 		issuerEMail.setText(issuer.getContactEMail());
+		
+		// Display expiry, this should in fact be refactored
+		Calendar expires = Calendar.getInstance();
+		long expiry_epoch = new BigInteger(credential.getAttributes().get(
+				"expiry")).longValue();
+		expires.setTimeInMillis(expiry_epoch * IdemixCredentials.EXPIRY_FACTOR);
+		if (Calendar.getInstance().after(expires)) {
+			// Credential has expired
+		} else {
+			// Credential still valid
+			SimpleDateFormat sdf = new SimpleDateFormat("d MMMM yyyy");
+			validityValue.setText(sdf.format(expires.getTime()));
+			int deltaDays = (int) ((expires.getTime().getTime() - Calendar
+					.getInstance().getTime().getTime())
+					/ (1000 * 60 * 60 * 24));
+			// FIXME: text should be from resources
+			validityRemaining.setText(deltaDays + " days remaining");
+		}
 		
 		credentialDescription.setText(credential.getCredentialDescription().getDescription());
 		

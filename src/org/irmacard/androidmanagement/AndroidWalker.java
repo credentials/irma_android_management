@@ -1,7 +1,6 @@
 package org.irmacard.androidmanagement;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,6 +17,7 @@ import android.util.Log;
 
 public class AndroidWalker implements TreeWalkerI {
 	static final String IRMA_CORE = "irma_configuration/";
+	static final String TAG = "AWalker";
 	
 	DescriptionStore descriptionStore;
 	AssetManager assetManager;
@@ -69,6 +69,16 @@ public class AndroidWalker implements TreeWalkerI {
 		} catch (IOException e) {
 			new InfoException(e,
 					"Failed to read credentials issued by " + issuer + ".");
+		}
+	}
+
+	@Override
+	public InputStream retrieveFile(URI path) throws InfoException {
+		try {
+			return assetManager.open(IRMA_CORE + path.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new InfoException(e, "reading file " + path);
 		}
 	}
 

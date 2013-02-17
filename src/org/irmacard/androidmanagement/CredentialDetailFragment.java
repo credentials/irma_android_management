@@ -1,11 +1,16 @@
 package org.irmacard.androidmanagement;
 
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -13,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -41,6 +47,7 @@ public class CredentialDetailFragment extends Fragment {
 	
 	CredentialAttributeAdapter mAdapter;
 	CredentialPackage credential;
+	AndroidWalker aw;
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -68,6 +75,8 @@ public class CredentialDetailFragment extends Fragment {
 				}
 			}
 		}
+		
+		aw = new AndroidWalker(getResources().getAssets());
 	}
 
 	@Override
@@ -96,6 +105,7 @@ public class CredentialDetailFragment extends Fragment {
 		TextView credentialDescription = (TextView) view.findViewById(R.id.detail_credential_desc_text);
 		TextView validityValue = (TextView) view.findViewById(R.id.detail_validity_value);
 		TextView validityRemaining = (TextView) view.findViewById(R.id.detail_validity_remaining);
+		ImageView issuerLogo = (ImageView) view.findViewById(R.id.detail_issuer_logo);
 		
 		IssuerDescription issuer = credential.getCredentialDescription().getIssuerDescription();
 		issuerName.setText(issuer.getName());
@@ -126,6 +136,24 @@ public class CredentialDetailFragment extends Fragment {
 		
 		credentialDescription.setText(credential.getCredentialDescription().getDescription());
 		
+		// Setting logo of issuer
+		// FIXME: this should go via the API
+		String issuerID = credential.getCredentialDescription().getIssuerID();
+		Bitmap logo = null;
+		try {
+			logo = BitmapFactory.decodeStream(aw.retrieveFile(new URI(issuerID + "/logo.png")));
+		} catch (InfoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if(logo != null) {
+			issuerLogo.setImageBitmap(logo);
+		}
+
 		list.setAdapter(mAdapter);
 	}
 }

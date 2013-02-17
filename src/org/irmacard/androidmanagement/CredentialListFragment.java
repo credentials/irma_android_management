@@ -132,6 +132,12 @@ public class CredentialListFragment extends ListFragment {
 
 		mCallbacks = (Callbacks) activity;
 	}
+	
+	public void simulateClick(int pos) {
+	    if(pos < credentials.size()) {
+	    	getListView().performItemClick(getView(), pos, getListView().getItemIdAtPosition(pos));
+	    }
+	}
 
 	@Override
 	public void onDetach() {

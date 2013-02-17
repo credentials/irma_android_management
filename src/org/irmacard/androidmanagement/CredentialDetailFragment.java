@@ -109,10 +109,14 @@ public class CredentialDetailFragment extends Fragment {
 		expires.setTimeInMillis(expiry_epoch * IdemixCredentials.EXPIRY_FACTOR);
 		if (Calendar.getInstance().after(expires)) {
 			// Credential has expired
+			validityValue.setText(R.string.credential_no_longer_valid);
+			validityValue.setTextColor(getResources().getColor(R.color.irmared));
+			validityRemaining.setText("");
 		} else {
 			// Credential still valid
 			SimpleDateFormat sdf = new SimpleDateFormat("d MMMM yyyy");
 			validityValue.setText(sdf.format(expires.getTime()));
+
 			int deltaDays = (int) ((expires.getTime().getTime() - Calendar
 					.getInstance().getTime().getTime())
 					/ (1000 * 60 * 60 * 24));

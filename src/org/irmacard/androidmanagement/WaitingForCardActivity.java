@@ -1,5 +1,6 @@
 package org.irmacard.androidmanagement;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -25,6 +26,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
@@ -38,12 +40,14 @@ public class WaitingForCardActivity extends Activity {
 	
 	private final String TAG = "WaitingForCard";
 	
-	private final int STATE_IDLE = 0;
-	private final int STATE_CHECKING = 1;
+	private static final int STATE_IDLE = 0;
+	private static final int STATE_CHECKING = 1;
 	private int activityState = STATE_IDLE;
 	
     public static final byte[] DEFAULT_PIN = {0x30, 0x30, 0x30, 0x30};
     public static final byte[] DEFAULT_MASTER_PIN = {0x30, 0x30, 0x30, 0x30, 0x30, 0x30};
+    
+    public static final String EXTRA_CREDENTIAL_PACKAGES = "org.irmacard.androidmanagement.verification_packages";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +118,7 @@ public class WaitingForCardActivity extends Activity {
     		// Make sure we're not already communicating with a card
     		if (activityState != STATE_CHECKING) {
     			activityState = STATE_CHECKING;
-	    		new LoadCredentialsFromCardTask().execute(tag);
+	    		new LoadCredentialsFromCardTask(this).execute(tag);
     		}
     	}    	
     }
@@ -125,12 +129,17 @@ public class WaitingForCardActivity extends Activity {
         setIntent(intent);
     }
     
-    private class LoadCredentialsFromCardTask extends AsyncTask<IsoDep, Void, List<CredentialPackage>> {
+    private class LoadCredentialsFromCardTask extends AsyncTask<IsoDep, Void, ArrayList<CredentialPackage>> {
     	private final String TAG = "LoadingTask";
+    	private Context context;
+    	
+    	protected LoadCredentialsFromCardTask(Context context) {
+    		this.context = context;
+    	}
 
 		@Override
-		protected List<CredentialPackage> doInBackground(IsoDep... arg0) {
-			Vector<CredentialPackage> results = new Vector<CredentialPackage>();
+		protected ArrayList<CredentialPackage> doInBackground(IsoDep... arg0) {
+			ArrayList<CredentialPackage> results = new ArrayList<CredentialPackage>();
 			IsoDep tag = arg0[0];
 			
 			// Make sure time-out is long enough (10 seconds)
@@ -165,9 +174,14 @@ public class WaitingForCardActivity extends Activity {
 		}
 		
 		@Override
-		protected void onPostExecute(List<CredentialPackage> verification) {
+		protected void onPostExecute(ArrayList<CredentialPackage> verification) {
 			Log.i(TAG, "On post execute now with nice results");
 			activityState = STATE_IDLE;
+			
+			// Move to CredentialListActivity
+			Intent intent = new Intent(context, CredentialListActivity.class);
+			intent.putExtra(EXTRA_CREDENTIAL_PACKAGES, verification);
+			startActivity(intent);
 		}
     }
 

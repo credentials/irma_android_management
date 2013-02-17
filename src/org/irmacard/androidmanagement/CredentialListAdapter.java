@@ -19,20 +19,20 @@ public class CredentialListAdapter extends BaseAdapter {
 	private Activity activity;
 	private static LayoutInflater inflater = null;
 
-	private List<CredentialDescription> cred_desc;
+	private List<CredentialPackage> credentials;
 
 	public CredentialListAdapter(Activity activity,
-			List<CredentialDescription> cred_desc) {
+			List<CredentialPackage> credentials) {
 		this.activity = activity;
 		inflater = (LayoutInflater) activity
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		this.cred_desc = cred_desc;
+		this.credentials = credentials;
 	}
 
 	@Override
 	public int getCount() {
-		return cred_desc.size();
+		return credentials.size();
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class CredentialListAdapter extends BaseAdapter {
 
 	@Override
 	public long getItemId(int position) {
-		return cred_desc.get(position).getId();
+		return credentials.get(position).getCredentialDescription().getId();
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class CredentialListAdapter extends BaseAdapter {
 		TextView name = (TextView) view
 				.findViewById(R.id.item_label);
 
-		CredentialDescription desc = cred_desc.get(position);
+		CredentialDescription desc = credentials.get(position).getCredentialDescription();
 		name.setText(desc.getShortName());
 		return view;
 	}

@@ -1,8 +1,11 @@
 package org.irmacard.androidmanagement;
 
+import java.util.ArrayList;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 /**
  * An activity representing a list of Credentials. This activity has different
@@ -28,10 +31,20 @@ public class CredentialListActivity extends FragmentActivity implements
 	 * device.
 	 */
 	private boolean mTwoPane;
+	
+	private ArrayList<CredentialPackage> credentials;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// Pass the list of CredentialPackages on to the ListFragement
+		Intent intent = getIntent();
+		@SuppressWarnings("unchecked")
+		ArrayList<CredentialPackage> credentials = (ArrayList<CredentialPackage>) intent
+				.getSerializableExtra(WaitingForCardActivity.EXTRA_CREDENTIAL_PACKAGES);
+		setCredentials(credentials);
+		
 		setContentView(R.layout.activity_credential_list);
 
 		if (findViewById(R.id.credential_detail_container) != null) {
@@ -47,8 +60,10 @@ public class CredentialListActivity extends FragmentActivity implements
 					.findFragmentById(R.id.credential_list))
 					.setActivateOnItemClick(true);
 		}
+	}
 
-		// TODO: If exposing deep links into your app, handle intents here.
+	private void setCredentials(ArrayList<CredentialPackage> credentials) {
+		this.credentials = credentials;
 	}
 
 	/**
@@ -77,5 +92,9 @@ public class CredentialListActivity extends FragmentActivity implements
 			detailIntent.putExtra(CredentialDetailFragment.ARG_ITEM_ID, id);
 			startActivity(detailIntent);
 		}
+	}
+	
+	protected ArrayList<CredentialPackage> getCredentials() {
+		return credentials;
 	}
 }

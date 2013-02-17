@@ -1,5 +1,6 @@
 package org.irmacard.androidmanagement;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -46,7 +47,7 @@ public class CredentialListFragment extends ListFragment {
 	 */
 	private int mActivatedPosition = ListView.INVALID_POSITION;
 	
-	private List<CredentialDescription> cred_desc = null;
+	private ArrayList<CredentialPackage> credentials = null;
 
 	/**
 	 * A callback interface that all activities containing this fragment must
@@ -84,22 +85,24 @@ public class CredentialListFragment extends ListFragment {
 	    AndroidWalker aw = new AndroidWalker(getResources().getAssets());
 	    DescriptionStore.setTreeWalker(aw);
 	    
-	    DescriptionStore descriptionStore = null;
 	    try {
-			descriptionStore = DescriptionStore.getInstance();
+			DescriptionStore.getInstance();
 		} catch (InfoException e) {
 			// TODO Auto-generated catch block
 			Log.e("error", "something went wrong");
 			e.printStackTrace();
 		}
 
-		// TODO: fill with more appropriate data
-	    cred_desc = new Vector<CredentialDescription>();
-	    cred_desc.add(descriptionStore.getCredentialDescription((short) 1));
-	    cred_desc.add(descriptionStore.getCredentialDescription((short) 10));
-	    cred_desc.add(descriptionStore.getCredentialDescription((short) 100));
+	    credentials = ((CredentialListActivity) getActivity()).getCredentials();
+		if (credentials == null) {
+			Log.i("blaat", "No credentials available yet");
+		} else {
+			for (CredentialPackage cp : credentials) {
+				Log.i("blaat", cp.toString());
+			}
+		}
 
-	    setListAdapter(new CredentialListAdapter(getActivity(), cred_desc));
+	    setListAdapter(new CredentialListAdapter(getActivity(), credentials));
 	}
 
 	@Override
@@ -145,7 +148,7 @@ public class CredentialListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(cred_desc.get(position).getId());
+		mCallbacks.onItemSelected(credentials.get(position).getCredentialDescription().getId());
 	}
 
 	@Override

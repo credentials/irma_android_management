@@ -44,6 +44,7 @@ public class WaitingForCardActivity extends Activity {
 	
 	private static final int STATE_IDLE = 0;
 	private static final int STATE_CHECKING = 1;
+	private static final int STATE_DISPLAYING = 2;
 	private int activityState = STATE_IDLE;
 	
     public static final byte[] DEFAULT_PIN = {0x30, 0x30, 0x30, 0x30};
@@ -118,11 +119,16 @@ public class WaitingForCardActivity extends Activity {
     		Log.i(TAG,"Found IsoDep tag!");
     		
     		// Make sure we're not already communicating with a card
-    		if (activityState != STATE_CHECKING) {
+    		if (activityState == STATE_IDLE) {
     			setState(STATE_CHECKING);
 	    		new LoadCredentialsFromCardTask(this).execute(tag);
     		}
-    	}    	
+    		
+        	if (activityState == STATE_DISPLAYING) {
+        		// Return to default state
+        		setState(STATE_IDLE);
+        	}
+    	}
     }
     
     public void setState(int state) {
@@ -203,7 +209,7 @@ public class WaitingForCardActivity extends Activity {
 		@Override
 		protected void onPostExecute(ArrayList<CredentialPackage> verification) {
 			Log.i(TAG, "On post execute now with nice results");
-			activityState = STATE_IDLE;
+			activityState = STATE_DISPLAYING;
 			
 			// Move to CredentialListActivity
 			Intent intent = new Intent(context, CredentialListActivity.class);

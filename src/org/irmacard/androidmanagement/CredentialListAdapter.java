@@ -1,5 +1,6 @@
 package org.irmacard.androidmanagement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.irmacard.credentials.Attributes;
@@ -27,7 +28,11 @@ public class CredentialListAdapter extends BaseAdapter {
 		inflater = (LayoutInflater) activity
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		this.credentials = credentials;
+		if (credentials != null) {
+			this.credentials = credentials;
+		} else {
+			this.credentials = new ArrayList<CredentialPackage>();
+		}
 	}
 
 	@Override

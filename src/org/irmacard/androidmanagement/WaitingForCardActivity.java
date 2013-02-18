@@ -24,6 +24,7 @@ import android.nfc.tech.IsoDep;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
@@ -34,17 +35,19 @@ import android.view.Menu;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class WaitingForCardActivity extends Activity {
+public class WaitingForCardActivity extends Activity implements EnterPINDialogFragment.PINDialogListener {
 	private NfcAdapter nfcA;
 	private PendingIntent mPendingIntent;
 	private IntentFilter[] mFilters;
 	private String[][] mTechLists;
+	private IsoDep tag;
 	
 	private final String TAG = "WaitingForCard";
 	
 	private static final int STATE_IDLE = 0;
-	private static final int STATE_CHECKING = 1;
-	private static final int STATE_DISPLAYING = 2;
+	private static final int STATE_WAITING_PIN = 1;
+	private static final int STATE_CHECKING = 2;
+	private static final int STATE_DISPLAYING = 3;
 	private int activityState = STATE_IDLE;
 	
     public static final byte[] DEFAULT_PIN = {0x30, 0x30, 0x30, 0x30};
@@ -114,14 +117,15 @@ public class WaitingForCardActivity extends Activity {
     
     public void processIntent(Intent intent) {
         Tag tagFromIntent = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-    	IsoDep tag = IsoDep.get(tagFromIntent);
+    	tag = IsoDep.get(tagFromIntent);
     	if (tag != null) {
     		Log.i(TAG,"Found IsoDep tag!");
     		
     		// Make sure we're not already communicating with a card
     		if (activityState == STATE_IDLE) {
-    			setState(STATE_CHECKING);
-	    		new LoadCredentialsFromCardTask(this).execute(tag);
+    			setState(STATE_WAITING_PIN);
+    			DialogFragment pinDialog = new EnterPINDialogFragment();
+    			pinDialog.show(getFragmentManager(), "pinentry");
     		}
     		
         	if (activityState == STATE_DISPLAYING) {
@@ -144,10 +148,14 @@ public class WaitingForCardActivity extends Activity {
     		statusTextResource = R.string.status_loading_credentials;
     		break;
     	case STATE_IDLE:
-    		Log.i("TAG", "Chainging status to IDLE");
+    		Log.i("TAG", "Changing status to IDLE");
     		imageResource = R.drawable.irma_icon_place_card_520px;
     		statusTextResource = R.string.status_waiting_for_card;
     		break;
+    	case STATE_WAITING_PIN:
+    		Log.i(TAG, "Changing status to WAITING_PIN");
+    		imageResource = R.drawable.irma_icon_card_found_520px;
+    		statusTextResource = R.string.status_waiting_for_pin;
     	}
     	
     	((TextView) findViewById(R.id.statustext)).setText(statusTextResource);
@@ -164,10 +172,12 @@ public class WaitingForCardActivity extends Activity {
     
     private class LoadCredentialsFromCardTask extends AsyncTask<IsoDep, Void, ArrayList<CredentialPackage>> {
     	private final String TAG = "LoadingTask";
+    	private String pin;
     	private Context context;
     	
-    	protected LoadCredentialsFromCardTask(Context context) {
+    	protected LoadCredentialsFromCardTask(Context context, String pin) {
     		this.context = context;
+    		this.pin = pin;
     	}
 
 		@Override
@@ -184,7 +194,7 @@ public class WaitingForCardActivity extends Activity {
 			try {
 				ic.issuePrepare();
 				is.sendPin(DEFAULT_PIN);
-				is.sendPin(IdemixSmartcard.PIN_CARD, DEFAULT_MASTER_PIN);
+				is.sendPin(IdemixSmartcard.PIN_CARD, pin.getBytes());
 				Log.i(TAG,"Retrieving credentials now"); 
 				List<CredentialDescription> credentials = ic.getCredentials();
 				for(CredentialDescription cd : credentials) {
@@ -217,5 +227,18 @@ public class WaitingForCardActivity extends Activity {
 			startActivity(intent);
 		}
     }
+
+	@Override
+	public void onPINEntry(String pincode) {
+		Log.i(TAG, "Pin entered " + pincode);
+		setState(STATE_CHECKING);
+		new LoadCredentialsFromCardTask(this, pincode).execute(tag);
+	}
+
+	@Override
+	public void onPINCancel() {
+		Log.i(TAG, "Pin entry canceled!");
+		setState(STATE_IDLE);
+	}
 
 }

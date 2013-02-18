@@ -15,7 +15,10 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_waiting_for_card">Waiting For Card</string>
     <string name="status_waiting_for_card">Waiting for card</string>
+    <string name="status_waiting_for_pin">Waiting for PIN</string>
     <string name="status_loading_credentials">Loading credentials&#8230;</string>
     <string name="credential_no_longer_valid">No longer valid</string>
+    <string name="pinmessage">Please enter Maintenance PIN</string>
+    <string name="pinhint">Maintenance PIN</string>
 
 </resources>

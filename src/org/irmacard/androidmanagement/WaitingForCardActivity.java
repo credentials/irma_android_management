@@ -221,10 +221,14 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 			Log.i(TAG, "On post execute now with nice results");
 			activityState = STATE_DISPLAYING;
 			
-			// Move to CredentialListActivity
-			Intent intent = new Intent(context, CredentialListActivity.class);
-			intent.putExtra(EXTRA_CREDENTIAL_PACKAGES, verification);
-			startActivity(intent);
+			if(verification != null) {
+				// Move to CredentialListActivity
+				Intent intent = new Intent(context, CredentialListActivity.class);
+				intent.putExtra(EXTRA_CREDENTIAL_PACKAGES, verification);
+				startActivity(intent);
+			} else {
+				setState(STATE_IDLE);
+			}
 		}
     }
 

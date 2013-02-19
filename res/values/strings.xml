@@ -18,7 +18,7 @@
     <string name="status_waiting_for_pin">Waiting for PIN</string>
     <string name="status_loading_credentials">Loading credentials&#8230;</string>
     <string name="credential_no_longer_valid">No longer valid</string>
-    <string name="pinmessage">Please enter Maintenance PIN</string>
+    <string name="pinmessage">Please enter maintenance PIN</string>
     <string name="pinhint">Maintenance PIN</string>
 
 </resources>

@@ -1,22 +1,15 @@
 package org.irmacard.androidmanagement;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import org.irmacard.androidmanagement.dummy.DummyContent;
 import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.credentials.info.InfoException;
-import org.irmacard.credentials.info.CredentialDescription;
-
 import org.irmacard.androidmanagement.AndroidWalker;
 
 /**

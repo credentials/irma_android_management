@@ -21,34 +21,29 @@ package org.irmacard.androidmanagement;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
-import net.sourceforge.scuba.smartcards.CardService;
 import net.sourceforge.scuba.smartcards.IsoDepCardService;
 
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.IdemixCredentials;
-import org.irmacard.credentials.idemix.test.TestSetup;
 import org.irmacard.credentials.idemix.util.CredentialInformation;
 import org.irmacard.credentials.info.CredentialDescription;
 import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.credentials.info.InfoException;
+import org.irmacard.idemix.IdemixService;
+import org.irmacard.idemix.IdemixSmartcard;
 
-import service.IdemixSmartcard;
-import service.IdemixService;
-
+import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.PendingIntent;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.ImageView;

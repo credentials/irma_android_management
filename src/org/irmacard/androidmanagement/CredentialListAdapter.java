@@ -22,13 +22,10 @@ package org.irmacard.androidmanagement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.irmacard.credentials.Attributes;
-import org.irmacard.credentials.info.AttributeDescription;
 import org.irmacard.credentials.info.CredentialDescription;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

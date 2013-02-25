@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.view.View;
 
 /**
  * An activity representing a list of Credentials. This activity has different

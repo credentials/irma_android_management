@@ -4,10 +4,8 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/idemix_library"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/idemix_terminal"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/scuba_sc_android"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/credentials_api"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/credentials_idemix"/>
 	<classpathentry kind="output" path="bin/classes"/>

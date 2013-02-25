@@ -26,7 +26,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
+
+import org.irmacard.credentials.Attributes;
+import org.irmacard.credentials.idemix.IdemixCredentials;
+import org.irmacard.credentials.info.AttributeDescription;
+import org.irmacard.credentials.info.InfoException;
+import org.irmacard.credentials.info.IssuerDescription;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -38,12 +43,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import org.irmacard.credentials.Attributes;
-import org.irmacard.credentials.idemix.IdemixCredentials;
-import org.irmacard.credentials.info.AttributeDescription;
-import org.irmacard.credentials.info.InfoException;
-import org.irmacard.credentials.info.IssuerDescription;
 
 /**
  * A fragment representing a single Credential detail screen. This fragment is

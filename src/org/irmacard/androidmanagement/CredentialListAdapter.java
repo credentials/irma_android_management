@@ -33,14 +33,12 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 public class CredentialListAdapter extends BaseAdapter {
-	private Activity activity;
 	private static LayoutInflater inflater = null;
 
 	private List<CredentialPackage> credentials;
 
 	public CredentialListAdapter(Activity activity,
 			List<CredentialPackage> credentials) {
-		this.activity = activity;
 		inflater = (LayoutInflater) activity
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 

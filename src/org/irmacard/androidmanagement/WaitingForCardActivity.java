@@ -206,7 +206,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 			IdemixCredentials ic = new IdemixCredentials(is);
 			
 			try {
-				ic.issuePrepare();
+				ic.connect();
 				is.sendPin(DEFAULT_PIN);
 				is.sendPin(IdemixSmartcard.PIN_CARD, pin.getBytes());
 				Log.i(TAG,"Retrieving credentials now"); 

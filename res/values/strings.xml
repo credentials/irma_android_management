@@ -20,5 +20,7 @@
     <string name="credential_no_longer_valid">No longer valid</string>
     <string name="pinmessage">Please enter maintenance PIN</string>
     <string name="pinhint">Maintenance PIN</string>
+    <string name="log_button_text">Logs</string>
+    <string name="settings_button_text">Settings</string>
 
 </resources>

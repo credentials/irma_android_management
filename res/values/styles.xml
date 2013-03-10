@@ -27,5 +27,13 @@
     <style name="DetailHeading.Table" parent="DetailHeading">
         <item name="android:layout_width">@dimen/detail_label_width</item>
     </style>
+    
+    <style name="MenuButton" parent="AppTheme">
+        <item name="android:background">@drawable/credential_list_item_selector</item>
+        <item name="android:textColor">@drawable/credential_list_item_textselector</item>
+        <item name="android:gravity">left</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
 
 </resources>

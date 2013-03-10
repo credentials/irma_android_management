@@ -13,23 +13,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ListView;
 
 public class MenuFragment extends Fragment {	
 	private CredentialListAdapter listAdapter;
 	private ArrayList<CredentialPackage> credentials = null;
 	private ListView listView;
-
-	/**
-	 * The serialization (saved instance state) Bundle key representing the
-	 * activated item position. Only used on tablets.
-	 */
-	private static final String STATE_ACTIVATED_POSITION = "activated_position";
-
-	/**
-	 * The current activated item position. Only used on tablets.
-	 */
-	private int mActivatedPosition = ListView.INVALID_POSITION;
+	private Button log_button;
+	private Button settings_button;
 
 	/**
 	 * The fragment's current callback object, which is notified of list item
@@ -124,20 +116,27 @@ public class MenuFragment extends Fragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		listView = (ListView) view
 				.findViewById(R.id.credential_menu_list);
+		log_button = (Button) view.findViewById(R.id.credential_menu_log_button);
+		settings_button = (Button) view.findViewById(R.id.credential_menu_settings_button);
 
 		listView.setAdapter(listAdapter);
-
-		// Restore the previously serialized activated item position.
-		if (savedInstanceState != null
-				&& savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
-			setActivatedPosition(savedInstanceState
-					.getInt(STATE_ACTIVATED_POSITION));
-		}
 
 		// On item clicked in list
 		listView.setOnItemClickListener(new OnItemClickListener() {
 		    public void onItemClick(AdapterView<?> parent, View v, int position, long id){
-		        mCallbacks.onItemSelected(credentials.get(position).getCredentialDescription().getId());
+		        clickedListItem(position, v);
+		    }
+		});
+
+		log_button.setOnClickListener(new View.OnClickListener() {
+		    public void onClick(View v){
+		        clickedLogButton();
+		    }
+		});
+
+		settings_button.setOnClickListener(new View.OnClickListener() {
+		    public void onClick(View v){
+		        clickedSettingsButton();
 		    }
 		});
 	}
@@ -167,27 +166,31 @@ public class MenuFragment extends Fragment {
 						: ListView.CHOICE_MODE_NONE);
 	}
 
-	private void setActivatedPosition(int position) {
-		if (position == ListView.INVALID_POSITION) {
-			listView.setItemChecked(mActivatedPosition, false);
-		} else {
-			listView.setItemChecked(position, true);
-		}
-
-		mActivatedPosition = position;
-	}
-
 	public void simulateListClick(int pos) {
 	    if(pos < credentials.size()) {
 	    	listView.performItemClick(getView(), pos, listView.getItemIdAtPosition(pos));
 	    }
 	}
-	
-	public void clickedLogButton() {
-		Log.i("blaat", "Log Button clicked");
+
+	private void clickedLogButton() {
+		listView.setItemChecked(listView.getCheckedItemPosition(), false);
+		settings_button.setActivated(false);
+		log_button.setActivated(true);
+
+		mCallbacks.onLogSelected();
 	}
-	
-	public void clickedSettingsButton() {
-		Log.i("blaat", "Settings Button clicked");
+
+	private void clickedSettingsButton() {
+		listView.setItemChecked(listView.getCheckedItemPosition(), false);
+		settings_button.setActivated(true);
+		log_button.setActivated(false);
+
+		mCallbacks.onSettingsSelected();
+	}
+
+	private void clickedListItem(int position, View item) {
+		settings_button.setActivated(false);
+		log_button.setActivated(false);
+		mCallbacks.onItemSelected(credentials.get(position).getCredentialDescription().getId());
 	}
 }

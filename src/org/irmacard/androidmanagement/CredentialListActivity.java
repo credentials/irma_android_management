@@ -43,7 +43,7 @@ import android.util.Log;
  * selections.
  */
 public class CredentialListActivity extends FragmentActivity implements
-		CredentialListFragment.Callbacks {
+		MenuFragment.Callbacks {
 
 	/**
 	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -75,12 +75,12 @@ public class CredentialListActivity extends FragmentActivity implements
 
 			// In two-pane mode, list items should be given the
 			// 'activated' state when touched.
-			((CredentialListFragment) getSupportFragmentManager()
-					.findFragmentById(R.id.credential_list))
-					.setActivateOnItemClick(true);
+			((MenuFragment) getSupportFragmentManager()
+					.findFragmentById(R.id.credential_menu_fragment))
+					.setTwoPaneMode(true);
 			Log.i("blaat", "Simulating initial click!!");
-			((CredentialListFragment) getSupportFragmentManager()
-					.findFragmentById(R.id.credential_list)).simulateClick(0);
+			((MenuFragment) getSupportFragmentManager()
+					.findFragmentById(R.id.credential_menu_fragment)).simulateListClick(0);
 		}
 	}
 
@@ -116,6 +116,14 @@ public class CredentialListActivity extends FragmentActivity implements
 		}
 	}
 	
+	public void onLogSelected() {
+		Log.i("cla", "log selected");
+	}
+
+	public void onSettingsSelected() {
+		Log.i("cla", "settings selected");
+	}
+
 	protected ArrayList<CredentialPackage> getCredentials() {
 		return credentials;
 	}

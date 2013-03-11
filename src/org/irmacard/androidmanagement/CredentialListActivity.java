@@ -34,13 +34,12 @@ import android.util.Log;
  * activity presents the list of items and item details side-by-side using two
  * vertical panes.
  * <p>
- * The activity makes heavy use of fragments. The list of items is a
- * {@link CredentialListFragment} and the item details (if present) is a
- * {@link CredentialDetailFragment}.
+ * The activity makes heavy use of fragments. The list of items combined with
+ * log and settings buttons is a {@link MenuFragment} and the item details (if
+ * present) is a {@link CredentialDetailFragment}.
  * <p>
- * This activity also implements the required
- * {@link CredentialListFragment.Callbacks} interface to listen for item
- * selections.
+ * This activity also implements the required {@link MenuFragment.Callbacks}
+ * interface to listen for item selections and button callbacks.
  */
 public class CredentialListActivity extends FragmentActivity implements
 		MenuFragment.Callbacks {
@@ -89,7 +88,7 @@ public class CredentialListActivity extends FragmentActivity implements
 	}
 
 	/**
-	 * Callback method from {@link CredentialListFragment.Callbacks} indicating
+	 * Callback method from {@link MenuFragment.Callbacks} indicating
 	 * that the item with the given ID was selected.
 	 */
 	@Override
@@ -116,10 +115,18 @@ public class CredentialListActivity extends FragmentActivity implements
 		}
 	}
 	
+	/**
+	 * Callback method from {@link MenuFragment.Callbacks} indicating
+	 * that the log was selected.
+	 */
 	public void onLogSelected() {
 		Log.i("cla", "log selected");
 	}
 
+	/**
+	 * Callback method from {@link MenuFragment.Callbacks} indicating
+	 * that the settings were selected.
+	 */
 	public void onSettingsSelected() {
 		Log.i("cla", "settings selected");
 	}

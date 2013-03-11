@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.irmacard.credentials.info.CredentialDescription;
 import org.irmacard.credentials.info.DescriptionStore;
@@ -32,6 +33,8 @@ import org.irmacard.credentials.info.IssuerDescription;
 import org.irmacard.credentials.info.TreeWalkerI;
 
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 public class AndroidWalker implements TreeWalkerI {
@@ -101,5 +104,20 @@ public class AndroidWalker implements TreeWalkerI {
 		}
 	}
 
+	public Bitmap getIssuerLogo(IssuerDescription issuer) {
+		Bitmap logo = null;
+		String issuerID = issuer.getID();
 
+		try {
+			logo = BitmapFactory.decodeStream(retrieveFile(new URI(issuerID + "/logo.png")));
+		} catch (InfoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return logo;
+	}
 }

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:paddingTop="5dp"
-    android:paddingBottom="5dp">
+    android:paddingBottom="5dp"
+    android:paddingRight="25dp">
 
     <ImageView android:id="@+id/log_item_action_image"
         android:layout_alignParentLeft="true"
@@ -32,7 +33,7 @@
     
     <ImageView android:id="@+id/log_item_actor_logo"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/log_item_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/actorlogo"/>

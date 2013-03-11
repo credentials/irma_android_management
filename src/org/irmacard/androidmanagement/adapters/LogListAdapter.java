@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.irmacard.androidmanagement.R;
+import org.irmacard.androidmanagement.util.AndroidWalker;
 import org.irmacard.credentials.util.log.IssueLogEntry;
 import org.irmacard.credentials.util.log.LogEntry;
 import org.irmacard.credentials.util.log.RemoveLogEntry;
@@ -40,6 +41,7 @@ import android.widget.TextView;
 
 public class LogListAdapter extends BaseAdapter {
 	private static LayoutInflater inflater = null;
+	private AndroidWalker aw;
 
 	private List<LogEntry> logs;
 
@@ -53,6 +55,8 @@ public class LogListAdapter extends BaseAdapter {
 		} else {
 			this.logs = new ArrayList<LogEntry>();
 		}
+
+		aw = new AndroidWalker(activity.getResources().getAssets());
 	}
 
 	@Override
@@ -89,24 +93,27 @@ public class LogListAdapter extends BaseAdapter {
 
 		LogEntry log = logs.get(position);
 		String header_text = "";
-		int actionImageResource = R.drawable.irma_icon_warning_064px; 
+		int actionImageResource = R.drawable.irma_icon_warning_064px;
 
 		if(log instanceof VerifyLogEntry) {
 			header_text = "Verified: ";
 			actionImageResource = R.drawable.irma_icon_ok_064px;
+			actorLogo.setImageResource(R.drawable.irma_logo_150);
 		} else if(log instanceof RemoveLogEntry) {
 			header_text = "Removed: ";
 			actionImageResource = R.drawable.irma_icon_missing_064px;
+			actorLogo.setImageResource(R.drawable.irma_logo_150);
 		} else if(log instanceof IssueLogEntry) {
 			header_text = "Issued: ";
 			actionImageResource = R.drawable.irma_icon_warning_064px;
+			actorLogo.setImageBitmap(aw.getIssuerLogo(log.getCredential()
+					.getIssuerDescription()));
 		}
 
 		header_text += log.getCredential().getName();
 		header.setText(header_text);
 		datetime.setText(SimpleDateFormat.getDateTimeInstance().format(log.getTimestamp()));
 		actionImage.setImageResource(actionImageResource);
-		actorLogo.setImageResource(R.drawable.irma_logo_150);
 
 		return view;
 	}

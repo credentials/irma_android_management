@@ -20,8 +20,6 @@
 package org.irmacard.androidmanagement;
 
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,11 +31,9 @@ import org.irmacard.androidmanagement.util.CredentialPackage;
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.info.AttributeDescription;
-import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.info.IssuerDescription;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -151,19 +147,9 @@ public class CredentialDetailFragment extends Fragment {
 		credentialDescription.setText(credential.getCredentialDescription().getDescription());
 		
 		// Setting logo of issuer
-		// FIXME: this should go via the API
-		String issuerID = credential.getCredentialDescription().getIssuerID();
-		Bitmap logo = null;
-		try {
-			logo = BitmapFactory.decodeStream(aw.retrieveFile(new URI(issuerID + "/logo.png")));
-		} catch (InfoException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		Bitmap logo = aw.getIssuerLogo(credential.getCredentialDescription()
+				.getIssuerDescription());
+
 		if(logo != null) {
 			issuerLogo.setImageBitmap(logo);
 		}

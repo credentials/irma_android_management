@@ -1,5 +1,5 @@
 /**
- * CredentialAttributeAdapter.java
+ * CredentialListAdapter.java
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,14 @@
  * Copyright (C) Wouter Lueks, Radboud University Nijmegen, Februari 2013.
  */
 
-package org.irmacard.androidmanagement;
+package org.irmacard.androidmanagement.adapters;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.irmacard.credentials.Attributes;
-import org.irmacard.credentials.info.AttributeDescription;
+import org.irmacard.androidmanagement.R;
+import org.irmacard.androidmanagement.util.CredentialPackage;
+import org.irmacard.credentials.info.CredentialDescription;
 
 import android.app.Activity;
 import android.content.Context;
@@ -32,22 +34,26 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-public class CredentialAttributeAdapter extends BaseAdapter {
+public class CredentialListAdapter extends BaseAdapter {
 	private static LayoutInflater inflater = null;
-	
-	private List<AttributeDescription> attr_desc;
-	private Attributes attr_vals;
-	
-	public CredentialAttributeAdapter(Activity activity, List<AttributeDescription> attr_desc, Attributes attr_vals) {
-		inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		
-		this.attr_desc = attr_desc;
-		this.attr_vals = attr_vals;
+
+	private List<CredentialPackage> credentials;
+
+	public CredentialListAdapter(Activity activity,
+			List<CredentialPackage> credentials) {
+		inflater = (LayoutInflater) activity
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+		if (credentials != null) {
+			this.credentials = credentials;
+		} else {
+			this.credentials = new ArrayList<CredentialPackage>();
+		}
 	}
 
 	@Override
 	public int getCount() {
-		return attr_desc.size();
+		return credentials.size();
 	}
 
 	@Override
@@ -58,23 +64,21 @@ public class CredentialAttributeAdapter extends BaseAdapter {
 
 	@Override
 	public long getItemId(int position) {
-		return position;
+		return credentials.get(position).getCredentialDescription().getId();
 	}
 
 	@Override
 	public View getView(int position, View convert_view, ViewGroup parent) {
 		View view = convert_view;
-		if(view == null) {
-			view = inflater.inflate(R.layout.row_attribute, null);
+		if (view == null) {
+			view = inflater.inflate(R.layout.list_item, null);
 		}
 
-		TextView name = (TextView) view.findViewById(R.id.detail_attribute_name);
-		TextView value = (TextView) view.findViewById(R.id.detail_attribute_value);
+		TextView name = (TextView) view
+				.findViewById(R.id.item_label);
 
-		AttributeDescription desc = attr_desc.get(position);
-		name.setText(desc.getName() + ":");
-		value.setText(new String(attr_vals.get(desc.getName())));
-
+		CredentialDescription desc = credentials.get(position).getCredentialDescription();
+		name.setText(desc.getShortName());
 		return view;
 	}
 

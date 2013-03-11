@@ -21,6 +21,8 @@ package org.irmacard.androidmanagement;
 
 import java.util.ArrayList;
 
+import org.irmacard.androidmanagement.util.CredentialPackage;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;

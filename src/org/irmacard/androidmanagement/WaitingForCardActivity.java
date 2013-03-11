@@ -24,6 +24,8 @@ import java.util.List;
 
 import net.sourceforge.scuba.smartcards.IsoDepCardService;
 
+import org.irmacard.androidmanagement.util.AndroidWalker;
+import org.irmacard.androidmanagement.util.CredentialPackage;
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.idemix.util.CredentialInformation;

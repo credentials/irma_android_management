@@ -17,7 +17,7 @@
  * Copyright (C) Wouter Lueks, Radboud University Nijmegen, Februari 2013.
  */
 
-package org.irmacard.androidmanagement;
+package org.irmacard.androidmanagement.util;
 
 import java.io.Serializable;
 

@@ -1,6 +1,10 @@
 package org.irmacard.androidmanagement;
 
 import java.util.ArrayList;
+
+import org.irmacard.androidmanagement.adapters.CredentialListAdapter;
+import org.irmacard.androidmanagement.util.AndroidWalker;
+import org.irmacard.androidmanagement.util.CredentialPackage;
 import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.credentials.info.InfoException;
 

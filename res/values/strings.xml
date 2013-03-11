@@ -6,6 +6,9 @@
     <string name="irmalogo">IRMA Logo</string>
     <string name="irmashape">GUI artifact</string>
     <string name="issuerlogo">Issuer Logo</string>
+    <string name="verifierlogo">Verifier Logo</string>
+    <string name="actorlogo">Actor Logo</string>
+    <string name="actionimage">Action Image</string>
     <string name="pinrequired">Pin required:</string>
     <string name="validtill">Valid until:</string>
     <string name="issuer">Issuer</string>

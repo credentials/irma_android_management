@@ -32,6 +32,7 @@ import org.irmacard.credentials.idemix.util.CredentialInformation;
 import org.irmacard.credentials.info.CredentialDescription;
 import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.credentials.info.InfoException;
+import org.irmacard.credentials.util.log.LogEntry;
 import org.irmacard.idemix.IdemixService;
 import org.irmacard.idemix.IdemixSmartcard;
 
@@ -68,8 +69,19 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 	
     public static final byte[] DEFAULT_PIN = {0x30, 0x30, 0x30, 0x30};
     public static final byte[] DEFAULT_MASTER_PIN = {0x30, 0x30, 0x30, 0x30, 0x30, 0x30};
-    
-    public static final String EXTRA_CREDENTIAL_PACKAGES = "org.irmacard.androidmanagement.verification_packages";
+
+    public static final String EXTRA_CREDENTIAL_PACKAGES = "org.irmacard.androidmanagement.credential_packages";
+    public static final String EXTRA_LOG_ENTRIES = "org.irmacard.androidmanagement.log_entries";
+
+	private class CardData {
+		public ArrayList<CredentialPackage> credentials;
+		public ArrayList<LogEntry> logs;
+
+		public CardData(ArrayList<CredentialPackage> credentials, ArrayList<LogEntry> logs) {
+			this.credentials = credentials;
+			this.logs = logs;
+		}
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -186,19 +198,21 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
         setIntent(intent);
     }
     
-    private class LoadCredentialsFromCardTask extends AsyncTask<IsoDep, Void, ArrayList<CredentialPackage>> {
+    private class LoadCredentialsFromCardTask extends AsyncTask<IsoDep, Void, CardData> {
     	private final String TAG = "LoadingTask";
     	private String pin;
     	private Context context;
-    	
+
     	protected LoadCredentialsFromCardTask(Context context, String pin) {
     		this.context = context;
     		this.pin = pin;
     	}
 
 		@Override
-		protected ArrayList<CredentialPackage> doInBackground(IsoDep... arg0) {
-			ArrayList<CredentialPackage> results = new ArrayList<CredentialPackage>();
+		protected CardData doInBackground(IsoDep... arg0) {
+			ArrayList<CredentialPackage> credentialpks = new ArrayList<CredentialPackage>();
+			ArrayList<LogEntry> logs = new ArrayList<LogEntry>();
+
 			IsoDep tag = arg0[0];
 			
 			// Make sure time-out is long enough (10 seconds)
@@ -211,14 +225,21 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 				ic.connect();
 				is.sendPin(DEFAULT_PIN);
 				is.sendPin(IdemixSmartcard.PIN_CARD, pin.getBytes());
+
 				Log.i(TAG,"Retrieving credentials now"); 
 				List<CredentialDescription> credentials = ic.getCredentials();
 				for(CredentialDescription cd : credentials) {
 					Log.i(TAG, "Found credential: " + cd);
 					Attributes attr = ic.getAttributes(cd);
 					Log.i(TAG, "With attributes: " + attr);
-					results.add(new CredentialPackage(cd, attr));
+					credentialpks.add(new CredentialPackage(cd, attr));
 				}
+
+				Log.i(TAG,"Retrieving logs now");
+				for(LogEntry l : ic.getLog()) {
+					logs.add(l);
+				}
+
 				is.close();
 				tag.close();
 				
@@ -229,18 +250,19 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 				return null;
 			}
 			
-			return results;
+			return new CardData(credentialpks, logs);
 		}
 		
 		@Override
-		protected void onPostExecute(ArrayList<CredentialPackage> verification) {
+		protected void onPostExecute(CardData data) {
 			Log.i(TAG, "On post execute now with nice results");
 			activityState = STATE_DISPLAYING;
 			
-			if(verification != null) {
+			if(data != null) {
 				// Move to CredentialListActivity
 				Intent intent = new Intent(context, CredentialListActivity.class);
-				intent.putExtra(EXTRA_CREDENTIAL_PACKAGES, verification);
+				intent.putExtra(EXTRA_CREDENTIAL_PACKAGES, data.credentials);
+				intent.putExtra(EXTRA_LOG_ENTRIES, data.logs);
 				startActivity(intent);
 			} else {
 				setState(STATE_IDLE);

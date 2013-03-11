@@ -22,6 +22,7 @@ package org.irmacard.androidmanagement;
 import java.util.ArrayList;
 
 import org.irmacard.androidmanagement.util.CredentialPackage;
+import org.irmacard.credentials.util.log.LogEntry;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -53,6 +54,7 @@ public class CredentialListActivity extends FragmentActivity implements
 	private boolean mTwoPane;
 	
 	private ArrayList<CredentialPackage> credentials;
+	private ArrayList<LogEntry> logs;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,11 @@ public class CredentialListActivity extends FragmentActivity implements
 				.getSerializableExtra(WaitingForCardActivity.EXTRA_CREDENTIAL_PACKAGES);
 		setCredentials(credentials);
 		
+		@SuppressWarnings("unchecked")
+		ArrayList<LogEntry> logs = (ArrayList<LogEntry>) intent
+				.getSerializableExtra(WaitingForCardActivity.EXTRA_LOG_ENTRIES);
+		setLogs(logs);
+
 		setContentView(R.layout.activity_credential_list);
 
 		if (findViewById(R.id.credential_detail_container) != null) {
@@ -87,6 +94,10 @@ public class CredentialListActivity extends FragmentActivity implements
 
 	private void setCredentials(ArrayList<CredentialPackage> credentials) {
 		this.credentials = credentials;
+	}
+
+	private void setLogs(ArrayList<LogEntry> logs) {
+		this.logs = logs;
 	}
 
 	/**
@@ -123,6 +134,20 @@ public class CredentialListActivity extends FragmentActivity implements
 	 */
 	public void onLogSelected() {
 		Log.i("cla", "log selected");
+		if (mTwoPane) {
+			// In two-pane mode, show the detail view in this activity by
+			// adding or replacing the detail fragment using a
+			// fragment transaction.
+			LogFragment fragment = new LogFragment();
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.credential_detail_container, fragment)
+					.commit();
+
+		} else {
+			// In single-pane mode, simply start the detail activity
+			// for the selected item ID.
+			// FIXME: make single window version of this application
+		}
 	}
 
 	/**
@@ -135,5 +160,9 @@ public class CredentialListActivity extends FragmentActivity implements
 
 	protected ArrayList<CredentialPackage> getCredentials() {
 		return credentials;
+	}
+
+	public ArrayList<LogEntry> getLogs() {
+		return logs;
 	}
 }

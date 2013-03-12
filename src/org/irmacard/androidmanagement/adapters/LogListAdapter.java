@@ -21,6 +21,7 @@ package org.irmacard.androidmanagement.adapters;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.irmacard.androidmanagement.R;
@@ -32,11 +33,13 @@ import org.irmacard.credentials.util.log.VerifyLogEntry;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class LogListAdapter extends BaseAdapter {
@@ -44,6 +47,7 @@ public class LogListAdapter extends BaseAdapter {
 	private AndroidWalker aw;
 
 	private List<LogEntry> logs;
+	private Activity activity;
 
 	public LogListAdapter(Activity activity,
 			List<LogEntry> credentials) {
@@ -56,6 +60,7 @@ public class LogListAdapter extends BaseAdapter {
 			this.logs = new ArrayList<LogEntry>();
 		}
 
+		this.activity = activity;
 		aw = new AndroidWalker(activity.getResources().getAssets());
 	}
 
@@ -90,15 +95,52 @@ public class LogListAdapter extends BaseAdapter {
 				.findViewById(R.id.log_item_action_image);
 		ImageView actorLogo = (ImageView) view
 				.findViewById(R.id.log_item_actor_logo);
+		LinearLayout attributesList = (LinearLayout) view
+				.findViewById(R.id.log_item_list_disclosure);
+
+		attributesList.removeAllViews();
 
 		LogEntry log = logs.get(position);
 		String header_text = "";
 		int actionImageResource = R.drawable.irma_icon_warning_064px;
+		HashMap<String, Boolean> attributesDisclosed = new HashMap<String, Boolean>();
 
 		if(log instanceof VerifyLogEntry) {
 			header_text = "Verified: ";
 			actionImageResource = R.drawable.irma_icon_ok_064px;
 			actorLogo.setImageResource(R.drawable.irma_logo_150);
+
+			VerifyLogEntry vlog = (VerifyLogEntry) log;
+			attributesDisclosed = vlog.getAttributesDisclosed();
+
+			// This is not so nice, rather used a Listview here, but it is not possible
+			// to easily make it not scrollable and show all the items.
+			for (String attr : attributesDisclosed.keySet()) {
+				View item_view = inflater.inflate(R.layout.log_disclosure_item,
+						null);
+
+				TextView attribute = (TextView) item_view
+						.findViewById(R.id.log_disclosure_attribute_name);
+				TextView mode = (TextView) item_view
+						.findViewById(R.id.log_disclosure_mode);
+
+				attribute.setText(attr);
+				String disclosure_text = "";
+				if (attributesDisclosed.get(attr)) {
+					disclosure_text = "disclosed";
+					mode.setTypeface(null, Typeface.BOLD);
+				} else {
+					disclosure_text = "hidden";
+					attribute.setTypeface(null, Typeface.NORMAL);
+					int color = activity.getResources().getColor(
+							R.color.irmagrey);
+					attribute.setTextColor(color);
+					mode.setTextColor(color);
+				}
+				mode.setText(disclosure_text);
+
+				attributesList.addView(item_view);
+			}
 		} else if(log instanceof RemoveLogEntry) {
 			header_text = "Removed: ";
 			actionImageResource = R.drawable.irma_icon_missing_064px;

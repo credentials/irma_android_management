@@ -37,4 +37,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/actorlogo"/>
+    
+    <LinearLayout android:id="@+id/log_item_list_disclosure"
+        android:layout_alignLeft="@id/log_item_header"
+        android:orientation="vertical"
+        android:layout_below="@id/log_item_action_image"
+        android:layout_toLeftOf="@id/log_item_actor_logo"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"/>
 </RelativeLayout>

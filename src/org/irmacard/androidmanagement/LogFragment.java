@@ -31,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class LogFragment extends Fragment {	
 	private LogListAdapter listAdapter;
@@ -65,6 +66,17 @@ public class LogFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_log,
 				container, false);
+
+		ListView list = (ListView) rootView.findViewById(R.id.log_list);
+		TextView no_items = (TextView) rootView.findViewById(R.id.log_no_log);
+
+		if(logs.isEmpty()) {
+			list.setVisibility(View.INVISIBLE);
+			no_items.setVisibility(View.VISIBLE);
+		} else {
+			list.setVisibility(View.VISIBLE);
+			no_items.setVisibility(View.INVISIBLE);
+		}
 		return rootView;
 	}
 	

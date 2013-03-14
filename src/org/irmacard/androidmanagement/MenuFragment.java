@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class MenuFragment extends Fragment {	
 	private CredentialListAdapter listAdapter;
@@ -113,6 +114,18 @@ public class MenuFragment extends Fragment {
 		Log.i("menu", "Inflating fragment layout");
 		View rootView = inflater.inflate(R.layout.fragment_menu,
 				container, false);
+
+		ListView list = (ListView) rootView.findViewById(R.id.credential_menu_list);
+		TextView no_items = (TextView) rootView.findViewById(R.id.credentials_menu_no_creds);
+
+		if(credentials.isEmpty()) {
+			list.setVisibility(View.INVISIBLE);
+			no_items.setVisibility(View.VISIBLE);
+		} else {
+			list.setVisibility(View.VISIBLE);
+			no_items.setVisibility(View.INVISIBLE);
+		}
+
 		Log.i("menu", "Done inflating fragment layout");
 		return rootView;
 	}

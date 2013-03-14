@@ -19,17 +19,17 @@
 
 package org.irmacard.androidmanagement;
 
-import java.math.BigInteger;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.irmacard.androidmanagement.adapters.CredentialAttributeAdapter;
 import org.irmacard.androidmanagement.util.AndroidWalker;
 import org.irmacard.androidmanagement.util.CredentialPackage;
 import org.irmacard.credentials.Attributes;
-import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.info.AttributeDescription;
 import org.irmacard.credentials.info.IssuerDescription;
 
@@ -122,26 +122,23 @@ public class CredentialDetailFragment extends Fragment {
 		issuerAddress.setText(issuer.getContactAddress());
 		issuerEMail.setText(issuer.getContactEMail());
 		
-		// Display expiry, this should in fact be refactored
-		Calendar expires = Calendar.getInstance();
-		long expiry_epoch = new BigInteger(credential.getAttributes().get(
-				"expiry")).longValue();
-		expires.setTimeInMillis(expiry_epoch * IdemixCredentials.EXPIRY_FACTOR);
-		if (Calendar.getInstance().after(expires)) {
-			// Credential has expired
-			validityValue.setText(R.string.credential_no_longer_valid);
-			validityValue.setTextColor(getResources().getColor(R.color.irmared));
-			validityRemaining.setText("");
-		} else {
-			// Credential still valid
-			SimpleDateFormat sdf = new SimpleDateFormat("d MMMM yyyy");
-			validityValue.setText(sdf.format(expires.getTime()));
+		// Display expiry
+		if (credential.getAttributes().isValid()) {
+			DateFormat sdf = SimpleDateFormat.getDateInstance(DateFormat.LONG);
+			Date expirydate = credential.getAttributes().getExpiryDate();
+			validityValue.setText(sdf.format(expirydate));
 
-			int deltaDays = (int) ((expires.getTime().getTime() - Calendar
+			int deltaDays = (int) ((expirydate.getTime() - Calendar
 					.getInstance().getTime().getTime())
 					/ (1000 * 60 * 60 * 24));
 			// FIXME: text should be from resources
 			validityRemaining.setText(deltaDays + " days remaining");
+
+		} else {
+			// Credential has expired
+			validityValue.setText(R.string.credential_no_longer_valid);
+			validityValue.setTextColor(getResources().getColor(R.color.irmared));
+			validityRemaining.setText("");
 		}
 		
 		credentialDescription.setText(credential.getCredentialDescription().getDescription());

@@ -1,0 +1,25 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <ImageView
+        android:id="@+id/detail_mainshape"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:contentDescription="@string/irmashape"
+        android:src="@drawable/whiteshaperounded" />
+
+    <TextView
+        	android:id="@+id/log_no_log"
+        	android:layout_height="wrap_content"
+        	android:layout_width="wrap_content"
+        	android:textSize="20sp"
+        	android:padding="30dp"
+        	android:gravity="center"
+        	android:textColor="@color/irmadarkblue"
+        	android:layout_centerInParent="true"
+        	android:text="@string/init_text"
+        	android:visibility="visible"/>
+</RelativeLayout>

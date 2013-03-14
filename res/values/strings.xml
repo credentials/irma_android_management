@@ -25,5 +25,7 @@
     <string name="pinhint">Maintenance PIN</string>
     <string name="log_button_text">Logs</string>
     <string name="settings_button_text">Settings</string>
-
+    <string name="no_logs_available">no log items found</string>
+    <string name="no_credentials_available">no credentials found</string>
+    <string name="init_text">Please select a credential on the left, go to your Logs, or modify the Settings on your card.</string>
 </resources>

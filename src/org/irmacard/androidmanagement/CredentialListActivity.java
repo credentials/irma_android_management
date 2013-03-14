@@ -86,6 +86,12 @@ public class CredentialListActivity extends FragmentActivity implements
 			((MenuFragment) getSupportFragmentManager()
 					.findFragmentById(R.id.credential_menu_fragment))
 					.setTwoPaneMode(true);
+
+			InitFragment initFragment = new InitFragment();
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.credential_detail_container, initFragment)
+					.commit();
+
 			Log.i("blaat", "Simulating initial click!!");
 			((MenuFragment) getSupportFragmentManager()
 					.findFragmentById(R.id.credential_menu_fragment)).simulateListClick(0);

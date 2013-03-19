@@ -26,9 +26,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.irmacard.android.util.credentials.AndroidWalker;
+import org.irmacard.android.util.credentials.CredentialPackage;
 import org.irmacard.androidmanagement.adapters.CredentialAttributeAdapter;
-import org.irmacard.androidmanagement.util.AndroidWalker;
-import org.irmacard.androidmanagement.util.CredentialPackage;
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.info.AttributeDescription;
 import org.irmacard.credentials.info.IssuerDescription;

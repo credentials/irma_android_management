@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.irmacard.android.util.credentials.AndroidWalker;
 import org.irmacard.androidmanagement.R;
-import org.irmacard.androidmanagement.util.AndroidWalker;
 import org.irmacard.credentials.util.log.IssueLogEntry;
 import org.irmacard.credentials.util.log.LogEntry;
 import org.irmacard.credentials.util.log.RemoveLogEntry;

@@ -22,8 +22,8 @@ package org.irmacard.androidmanagement.adapters;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.irmacard.android.util.credentials.CredentialPackage;
 import org.irmacard.androidmanagement.R;
-import org.irmacard.androidmanagement.util.CredentialPackage;
 import org.irmacard.credentials.info.CredentialDescription;
 
 import android.app.Activity;

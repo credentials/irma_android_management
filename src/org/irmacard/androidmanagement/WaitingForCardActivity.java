@@ -35,7 +35,6 @@ import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.util.log.LogEntry;
 import org.irmacard.idemix.IdemixService;
-import org.irmacard.idemix.IdemixSmartcard;
 
 import android.app.Activity;
 import android.app.DialogFragment;
@@ -224,8 +223,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 			
 			try {
 				ic.connect();
-				is.sendPin(DEFAULT_PIN);
-				is.sendPin(IdemixSmartcard.PIN_CARD, pin.getBytes());
+				is.sendCardPin(pin.getBytes());
 
 				Log.i(TAG,"Retrieving credentials now"); 
 				List<CredentialDescription> credentials = ic.getCredentials();

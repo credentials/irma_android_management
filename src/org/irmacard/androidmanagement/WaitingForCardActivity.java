@@ -19,6 +19,7 @@
 
 package org.irmacard.androidmanagement;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +58,8 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 	private PendingIntent mPendingIntent;
 	private IntentFilter[] mFilters;
 	private String[][] mTechLists;
-	private IsoDep tag;
+	private Tag tag;
+	private IsoDep isotag;
 	
 	private final String TAG = "WaitingForCard";
 	
@@ -72,6 +74,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 
     public static final String EXTRA_CREDENTIAL_PACKAGES = "org.irmacard.androidmanagement.credential_packages";
     public static final String EXTRA_LOG_ENTRIES = "org.irmacard.androidmanagement.log_entries";
+    public static final String EXTRA_TAG = "org.irmacard.androidmanagement.tag";
 
 	private class CardData {
 		public ArrayList<CredentialPackage> credentials;
@@ -144,9 +147,9 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
     }
     
     public void processIntent(Intent intent) {
-        Tag tagFromIntent = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-    	tag = IsoDep.get(tagFromIntent);
-    	if (tag != null) {
+        tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+    	isotag = IsoDep.get(tag);
+    	if (isotag != null) {
     		Log.i(TAG,"Found IsoDep tag!");
     		
     		// Make sure we're not already communicating with a card
@@ -240,15 +243,21 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 				}
 
 				is.close();
-				tag.close();
 				
 				Log.i(TAG, "All attributes read!");
 			} catch (Exception e) {
 				Log.e(TAG, "Reading verification caused exception");
 				e.printStackTrace();
 				return null;
+			} finally {
+				try {
+					tag.close();
+				} catch (IOException e) {
+					Log.e(TAG, "Failed to close tag connection");
+					e.printStackTrace();
+				}
 			}
-			
+
 			return new CardData(credentialpks, logs);
 		}
 		
@@ -262,6 +271,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 				Intent intent = new Intent(context, CredentialListActivity.class);
 				intent.putExtra(EXTRA_CREDENTIAL_PACKAGES, data.credentials);
 				intent.putExtra(EXTRA_LOG_ENTRIES, data.logs);
+				intent.putExtra(EXTRA_TAG, tag);
 				startActivity(intent);
 			} else {
 				setState(STATE_IDLE);
@@ -273,7 +283,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 	public void onPINEntry(String pincode) {
 		Log.i(TAG, "Pin entered " + pincode);
 		setState(STATE_CHECKING);
-		new LoadCredentialsFromCardTask(this, pincode).execute(tag);
+		new LoadCredentialsFromCardTask(this, pincode).execute(isotag);
 	}
 
 	@Override

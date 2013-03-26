@@ -36,9 +36,11 @@ import org.irmacard.credentials.info.IssuerDescription;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -116,6 +118,7 @@ public class CredentialDetailFragment extends Fragment {
 		TextView validityValue = (TextView) view.findViewById(R.id.detail_validity_value);
 		TextView validityRemaining = (TextView) view.findViewById(R.id.detail_validity_remaining);
 		ImageView issuerLogo = (ImageView) view.findViewById(R.id.detail_issuer_logo);
+		Button deleteButton = (Button) view.findViewById(R.id.detail_delete_button);
 		
 		IssuerDescription issuer = credential.getCredentialDescription().getIssuerDescription();
 		issuerName.setText(issuer.getName());
@@ -151,6 +154,19 @@ public class CredentialDetailFragment extends Fragment {
 			issuerLogo.setImageBitmap(logo);
 		}
 
+		// On delete button clicked
+		deleteButton.setOnClickListener(new View.OnClickListener() {
+		    public void onClick(View v){
+		        clickedDeleteButton();
+		    }
+		});
+
 		list.setAdapter(mAdapter);
+	}
+
+	private void clickedDeleteButton() {
+		Log.i("blaat", "Delete button clicked");
+		((CredentialListActivity) getActivity()).deleteCredential(credential
+				.getCredentialDescription());
 	}
 }

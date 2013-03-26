@@ -19,12 +19,28 @@
 
 package org.irmacard.androidmanagement;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
-import org.irmacard.android.util.credentials.CredentialPackage;
-import org.irmacard.credentials.util.log.LogEntry;
+import net.sourceforge.scuba.smartcards.CardServiceException;
+import net.sourceforge.scuba.smartcards.IsoDepCardService;
 
+import org.irmacard.android.util.credentials.CredentialPackage;
+import org.irmacard.android.util.pindialog.EnterPINDialogFragment;
+import org.irmacard.androidmanagement.util.TransmitResult;
+import org.irmacard.credentials.idemix.IdemixCredentials;
+import org.irmacard.credentials.info.CredentialDescription;
+
+import org.irmacard.credentials.util.log.LogEntry;
+import org.irmacard.idemix.IdemixService;
+import org.irmacard.idemix.IdemixSmartcard;
+
+import android.app.DialogFragment;
+import android.content.Context;
 import android.content.Intent;
+import android.nfc.Tag;
+import android.nfc.tech.IsoDep;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -45,7 +61,8 @@ import android.util.Log;
  * interface to listen for item selections and button callbacks.
  */
 public class CredentialListActivity extends FragmentActivity implements
-		MenuFragment.Callbacks {
+		MenuFragment.Callbacks, EnterPINDialogFragment.PINDialogListener,
+		CardMissingDialogFragment.CardMissingDialogListener {
 
 	/**
 	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -55,6 +72,34 @@ public class CredentialListActivity extends FragmentActivity implements
 	
 	private ArrayList<CredentialPackage> credentials;
 	private ArrayList<LogEntry> logs;
+	private Tag tag;
+
+	private interface CardProgram {
+		public TransmitResult run(IdemixService is) throws CardServiceException;
+	}
+
+	private enum Action {
+		NONE,
+		DELETE_CREDENTIAL,
+		CHANGE_CARD_PIN,
+		CHANGE_CREDENTIAL_PIN
+	}
+
+	private enum State {
+		NORMAL,
+		TEST_CARD_PRESENCE,
+		WAITING_FOR_CARD,
+		CONFIRM_ACTION,
+		PERFORM_ACTION,
+		ACTION_PERFORMED,
+		ACTION_FAILED
+	}
+
+	private Action currentAction = Action.NONE;
+	private State currentState = State.NORMAL;
+	private DialogFragment cardMissingDialog;
+	private CredentialDescription toBeDeleted;
+	private String pinCode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +116,10 @@ public class CredentialListActivity extends FragmentActivity implements
 		ArrayList<LogEntry> logs = (ArrayList<LogEntry>) intent
 				.getSerializableExtra(WaitingForCardActivity.EXTRA_LOG_ENTRIES);
 		setLogs(logs);
+
+		Tag tag = (Tag) intent
+				.getParcelableExtra(WaitingForCardActivity.EXTRA_TAG);
+		setTag(tag);
 
 		setContentView(R.layout.activity_credential_list);
 
@@ -104,6 +153,10 @@ public class CredentialListActivity extends FragmentActivity implements
 
 	private void setLogs(ArrayList<LogEntry> logs) {
 		this.logs = logs;
+	}
+
+	private void setTag(Tag tag) {
+		this.tag = tag;
 	}
 
 	/**
@@ -164,11 +217,251 @@ public class CredentialListActivity extends FragmentActivity implements
 		Log.i("cla", "settings selected");
 	}
 
+	public void onCardMissingCancel() {
+		// If cancelled we cannot continue with the action
+		gotoState(State.NORMAL);
+	}
+
+	public void onCardMissingRetry() {
+		// We should retry
+		gotoState(State.TEST_CARD_PRESENCE);
+	}
+
 	protected ArrayList<CredentialPackage> getCredentials() {
 		return credentials;
 	}
 
 	public ArrayList<LogEntry> getLogs() {
 		return logs;
+	}
+
+	private void gotoState(State state) {
+		String TAG = "CLA:State";
+
+		//State previousState = currentState;
+		currentState = state;
+
+		switch(state) {
+		case NORMAL:
+			Log.i(TAG, "Returning to default state");
+			break;
+		case TEST_CARD_PRESENCE:
+			Log.i(TAG, "Checking card presence");
+			new CheckCardPresentTask(this).execute(tag);
+			break;
+		case WAITING_FOR_CARD:
+			Log.i(TAG, "Going to wait for card");
+			cardMissingDialog = new CardMissingDialogFragment();
+			cardMissingDialog.show(getFragmentManager(), "cardmissing");
+			break;
+		case CONFIRM_ACTION:
+			Log.i(TAG, "Confirming action");
+			// For now we just handle deleting of credentials
+			DialogFragment pinDialog = new EnterPINDialogFragment();
+			pinDialog.show(getFragmentManager(), "pinentry");
+			break;
+		case ACTION_FAILED:
+			Log.i(TAG, "Action failed");
+			// TODO notify user
+			break;
+		case ACTION_PERFORMED:
+			Log.i(TAG, "Action succeeded");
+			completeAction();
+			gotoState(State.NORMAL);
+			break;
+		case PERFORM_ACTION:
+			Log.i(TAG, "Performing action");
+			runAction();
+			break;
+		}
+	}
+
+    private class CheckCardPresentTask extends AsyncTask<Tag, Void, TransmitResult> {
+    	private final String TAG = "CheckCardPresentTask";
+    	private Context context;
+
+		protected CheckCardPresentTask(Context context) {
+    		this.context = context;
+    	}
+
+		@Override
+		protected TransmitResult doInBackground(Tag... arg0) {
+			IsoDep tag = IsoDep.get(arg0[0]);
+
+			// Make sure time-out is long enough (10 seconds)
+			tag.setTimeout(10000);
+
+			IdemixService is = new IdemixService(new IsoDepCardService(tag));
+			TransmitResult result = null;
+
+			try {
+				is.open();
+				is.close();
+				result = new TransmitResult(TransmitResult.Result.SUCCESS);
+			} catch (CardServiceException e) {
+				Log.e(TAG, "Unable to select idemix applet");
+				e.printStackTrace();
+				return new TransmitResult(e);
+			} finally {
+				try {
+					tag.close();
+				} catch (IOException e) {
+					Log.e(TAG, "Failed to close tag connection");
+					e.printStackTrace();
+				}
+			}
+
+			return result;
+		}
+
+		@Override
+		protected void onPostExecute(TransmitResult tresult) {
+			switch(tresult.getResult()) {
+			case FAILURE:
+				gotoState(State.WAITING_FOR_CARD);
+				Log.i(TAG, "Cannot connect to card, proceeding to waiting for card");
+				break;
+			case SUCCESS:
+				gotoState(State.CONFIRM_ACTION);
+				break;
+			}
+		}
+    }
+
+    private class TransmitAPDUsTask extends AsyncTask<Tag, Void, TransmitResult> {
+    	private final String TAG = "TransmitAPDUsTask";
+    	private String pin;
+    	private Context context;
+    	private CardProgram cardProgram;
+
+		protected TransmitAPDUsTask(Context context, String pin,
+				CardProgram cardProgram) {
+    		this.context = context;
+    		this.pin = pin;
+    		this.cardProgram = cardProgram;
+    	}
+
+		@Override
+		protected TransmitResult doInBackground(Tag... arg0) {
+			IsoDep tag = IsoDep.get(arg0[0]);
+
+			// Make sure time-out is long enough (10 seconds)
+			tag.setTimeout(10000);
+
+			IdemixService is = new IdemixService(new IsoDepCardService(tag));
+			TransmitResult result = null;
+
+			try {
+				is.open();
+				is.sendPin(IdemixSmartcard.PIN_CARD, pin.getBytes());
+
+				Log.i(TAG,"Performing requested actions now");
+				result = cardProgram.run(is);
+				is.close();
+				Log.i(TAG, "Performed action succesfully!");
+			} catch (Exception e) {
+				Log.e(TAG, "Reading verification caused exception");
+				e.printStackTrace();
+				return new TransmitResult(e);
+			} finally {
+				try {
+					tag.close();
+				} catch (IOException e) {
+					Log.e(TAG, "Failed to close tag connection");
+					e.printStackTrace();
+				}
+			}
+
+			return result;
+		}
+
+		@Override
+		protected void onPostExecute(TransmitResult tresult) {
+			switch(tresult.getResult()) {
+			case SUCCESS:
+				Log.i(TAG, "Complete succesfully, finishing task");
+				gotoState(State.ACTION_PERFORMED);
+				break;
+			case FAILURE:
+				Log.i(TAG, "Action failed, notifying user");
+				gotoState(State.ACTION_FAILED);
+				break;
+			case INCORRECT_PIN:
+				Log.i(TAG, "Pincode incorrect, notifying user");
+				gotoState(State.NORMAL);
+			}
+		}
+    }
+
+	@Override
+	public void onPINEntry(String pincode) {
+		pinCode = pincode;
+		gotoState(State.PERFORM_ACTION);
+	}
+
+	public void runAction() {
+		CardProgram program = null;
+
+		switch (currentAction) {
+		case DELETE_CREDENTIAL:
+			program = new CardProgram() {
+				@Override
+				public TransmitResult run(IdemixService is) throws CardServiceException {
+					IdemixCredentials ic = new IdemixCredentials(is);
+					ic.removeCredential(toBeDeleted);
+					return new TransmitResult(TransmitResult.Result.SUCCESS);
+				}
+			};
+			break;
+		}
+		new TransmitAPDUsTask(this, pinCode, program).execute(tag);
+	}
+
+	public void completeAction() {
+		// This is run after action completes succesfully
+		switch (currentAction) {
+		case DELETE_CREDENTIAL:
+			Log.i("CLA:completeAction", "Removing item from list");
+
+			// Find deleted package
+			int deletedIdx = -1;
+			for(int i = 0 ; i <  credentials.size(); i++) {
+				CredentialPackage cp = credentials.get(i);
+				if(cp.getCredentialDescription().equals(toBeDeleted)) {
+					deletedIdx = i;
+				}
+			}
+
+			if(deletedIdx == -1) {
+				Log.i("CLA:completeAction", "Failed to locate credential");
+			} else {
+				credentials.remove(deletedIdx);
+			}
+
+			if(credentials.size() > 0) {
+				int new_idx = deletedIdx > 0 ? deletedIdx - 1 : 0;
+				((MenuFragment) getSupportFragmentManager()
+						.findFragmentById(R.id.credential_menu_fragment)).simulateListClick(new_idx);
+			} else {
+				InitFragment initFragment = new InitFragment();
+				getSupportFragmentManager().beginTransaction()
+						.replace(R.id.credential_detail_container, initFragment)
+						.commit();
+			}
+		}
+	}
+
+	@Override
+	public void onPINCancel() {
+		gotoState(State.NORMAL);
+	}
+
+	public void deleteCredential(CredentialDescription cd) {
+		Log.i("blaat", "Delete credential called");
+		toBeDeleted = cd;
+		currentAction = Action.DELETE_CREDENTIAL;
+		Log.i("blaat", "Will delete: " + cd.toString());
+
+		gotoState(State.TEST_CARD_PRESENCE);
 	}
 }

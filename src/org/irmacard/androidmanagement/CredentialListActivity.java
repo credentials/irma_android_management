@@ -26,7 +26,9 @@ import net.sourceforge.scuba.smartcards.CardServiceException;
 import net.sourceforge.scuba.smartcards.IsoDepCardService;
 
 import org.irmacard.android.util.credentials.CredentialPackage;
-import org.irmacard.android.util.pindialog.EnterPINDialogFragment;
+import org.irmacard.androidmanagement.dialogs.CardMissingDialogFragment;
+import org.irmacard.androidmanagement.dialogs.ConfirmDeleteDialogFragment;
+import org.irmacard.androidmanagement.dialogs.ConfirmDeleteDialogFragment.ConfirmDeleteDialogListener;
 import org.irmacard.androidmanagement.util.TransmitResult;
 import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.info.CredentialDescription;
@@ -60,7 +62,7 @@ import android.util.Log;
  * interface to listen for item selections and button callbacks.
  */
 public class CredentialListActivity extends FragmentActivity implements
-		MenuFragment.Callbacks, EnterPINDialogFragment.PINDialogListener,
+		MenuFragment.Callbacks, ConfirmDeleteDialogListener,
 		CardMissingDialogFragment.CardMissingDialogListener {
 
 	/**
@@ -98,7 +100,7 @@ public class CredentialListActivity extends FragmentActivity implements
 	private State currentState = State.NORMAL;
 	private DialogFragment cardMissingDialog;
 	private CredentialDescription toBeDeleted;
-	private String pinCode;
+	private String cardPin;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +121,8 @@ public class CredentialListActivity extends FragmentActivity implements
 		Tag tag = (Tag) intent
 				.getParcelableExtra(WaitingForCardActivity.EXTRA_TAG);
 		setTag(tag);
+
+		cardPin = (String) intent.getSerializableExtra(WaitingForCardActivity.EXTRA_CARD_PIN);
 
 		setContentView(R.layout.activity_credential_list);
 
@@ -256,8 +260,8 @@ public class CredentialListActivity extends FragmentActivity implements
 		case CONFIRM_ACTION:
 			Log.i(TAG, "Confirming action");
 			// For now we just handle deleting of credentials
-			DialogFragment pinDialog = new EnterPINDialogFragment();
-			pinDialog.show(getFragmentManager(), "pinentry");
+			ConfirmDeleteDialogFragment confirmDialog = ConfirmDeleteDialogFragment.getInstance(toBeDeleted);
+			confirmDialog.show(getFragmentManager(), "confirm_delete");
 			break;
 		case ACTION_FAILED:
 			Log.i(TAG, "Action failed");
@@ -393,9 +397,13 @@ public class CredentialListActivity extends FragmentActivity implements
     }
 
 	@Override
-	public void onPINEntry(String pincode) {
-		pinCode = pincode;
+	public void onConfirmDeleteOK() {
 		gotoState(State.PERFORM_ACTION);
+	}
+
+	@Override
+	public void onConfirmDeleteCancel() {
+		gotoState(State.NORMAL);
 	}
 
 	public void runAction() {
@@ -413,7 +421,7 @@ public class CredentialListActivity extends FragmentActivity implements
 			};
 			break;
 		}
-		new TransmitAPDUsTask(this, pinCode, program).execute(tag);
+		new TransmitAPDUsTask(this, cardPin, program).execute(tag);
 	}
 
 	public void completeAction() {
@@ -448,11 +456,6 @@ public class CredentialListActivity extends FragmentActivity implements
 						.commit();
 			}
 		}
-	}
-
-	@Override
-	public void onPINCancel() {
-		gotoState(State.NORMAL);
 	}
 
 	public void deleteCredential(CredentialDescription cd) {

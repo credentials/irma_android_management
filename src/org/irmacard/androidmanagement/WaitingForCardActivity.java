@@ -75,6 +75,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
     public static final String EXTRA_CREDENTIAL_PACKAGES = "org.irmacard.androidmanagement.credential_packages";
     public static final String EXTRA_LOG_ENTRIES = "org.irmacard.androidmanagement.log_entries";
     public static final String EXTRA_TAG = "org.irmacard.androidmanagement.tag";
+    public static final String EXTRA_CARD_PIN = "org.irmacard.androidmanagement.cardpin";
 
 	private class CardData {
 		public ArrayList<CredentialPackage> credentials;
@@ -272,6 +273,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 				intent.putExtra(EXTRA_CREDENTIAL_PACKAGES, data.credentials);
 				intent.putExtra(EXTRA_LOG_ENTRIES, data.logs);
 				intent.putExtra(EXTRA_TAG, tag);
+				intent.putExtra(EXTRA_CARD_PIN, pin);
 				startActivity(intent);
 			} else {
 				setState(STATE_IDLE);

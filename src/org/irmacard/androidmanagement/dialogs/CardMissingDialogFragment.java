@@ -17,7 +17,7 @@
  * Copyright (C) Wouter Lueks, Radboud University Nijmegen, March 2013.
  */
 
-package org.irmacard.androidmanagement;
+package org.irmacard.androidmanagement.dialogs;
 
 import android.app.Activity;
 import android.app.AlertDialog;

@@ -33,7 +33,6 @@ import org.irmacard.credentials.info.CredentialDescription;
 
 import org.irmacard.credentials.util.log.LogEntry;
 import org.irmacard.idemix.IdemixService;
-import org.irmacard.idemix.IdemixSmartcard;
 
 import android.app.DialogFragment;
 import android.content.Context;
@@ -353,7 +352,7 @@ public class CredentialListActivity extends FragmentActivity implements
 
 			try {
 				is.open();
-				is.sendPin(IdemixSmartcard.PIN_CARD, pin.getBytes());
+				is.sendCardPin(pin.getBytes());
 
 				Log.i(TAG,"Performing requested actions now");
 				result = cardProgram.run(is);

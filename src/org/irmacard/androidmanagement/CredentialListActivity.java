@@ -278,6 +278,20 @@ public class CredentialListActivity extends FragmentActivity implements
 	 */
 	public void onSettingsSelected() {
 		Log.i("cla", "settings selected");
+		if (mTwoPane) {
+			// In two-pane mode, show the detail view in this activity by
+			// adding or replacing the detail fragment using a
+			// fragment transaction.
+			SettingsFragment fragment = new SettingsFragment();
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.credential_detail_container, fragment)
+					.commit();
+
+		} else {
+			// In single-pane mode, simply start the detail activity
+			// for the selected item ID.
+			// FIXME: make single window version of this application
+		}
 	}
 
 	public void onCardMissingCancel() {

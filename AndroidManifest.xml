@@ -35,6 +35,9 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".CredentialListActivity" />
+            <intent-filter>
+                <action android:name="android.nfc.action.TECH_DISCOVERED" />
+            </intent-filter>
         </activity>
         <activity
             android:name="org.irmacard.androidmanagement.WaitingForCardActivity"

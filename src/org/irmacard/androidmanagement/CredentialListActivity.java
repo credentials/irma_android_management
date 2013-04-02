@@ -26,6 +26,7 @@ import net.sourceforge.scuba.smartcards.CardServiceException;
 import net.sourceforge.scuba.smartcards.IsoDepCardService;
 
 import org.irmacard.android.util.credentials.CredentialPackage;
+import org.irmacard.android.util.pindialog.EnterPINDialogFragment;
 import org.irmacard.androidmanagement.dialogs.CardMissingDialogFragment;
 import org.irmacard.androidmanagement.dialogs.ConfirmDeleteDialogFragment;
 import org.irmacard.androidmanagement.dialogs.ConfirmDeleteDialogFragment.ConfirmDeleteDialogListener;
@@ -37,8 +38,11 @@ import org.irmacard.credentials.util.log.LogEntry;
 import org.irmacard.idemix.IdemixService;
 
 import android.app.DialogFragment;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.os.AsyncTask;
@@ -74,6 +78,13 @@ public class CredentialListActivity extends FragmentActivity implements
 	private ArrayList<CredentialPackage> credentials;
 	private ArrayList<LogEntry> logs;
 	private Tag tag;
+
+	private NfcAdapter nfcA;
+	private PendingIntent mPendingIntent;
+	private IntentFilter[] mFilters;
+	private String[][] mTechLists;
+
+	private String TAG = "CredentialListActivity";
 
 	private interface CardProgram {
 		public TransmitResult run(IdemixService is) throws CardServiceException;
@@ -148,7 +159,56 @@ public class CredentialListActivity extends FragmentActivity implements
 			((MenuFragment) getSupportFragmentManager()
 					.findFragmentById(R.id.credential_menu_fragment)).simulateListClick(0);
 		}
+
+        // NFC stuff
+        nfcA = NfcAdapter.getDefaultAdapter(getApplicationContext());
+        mPendingIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+
+        // Setup an intent filter for all TECH based dispatches
+        IntentFilter tech = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
+        mFilters = new IntentFilter[] { tech };
+
+        // Setup a tech list for all IsoDep cards
+        mTechLists = new String[][] { new String[] { IsoDep.class.getName() } };
 	}
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(getIntent().getAction())) {
+            processIntent(getIntent());
+        }
+        if (nfcA != null) {
+        	nfcA.enableForegroundDispatch(this, mPendingIntent, mFilters, mTechLists);
+        }
+    }
+
+    @Override
+    public void onPause() {
+    	super.onPause();
+    	if (nfcA != null) {
+    		nfcA.disableForegroundDispatch(this);
+    	}
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        Log.i(TAG, "Discovered tag with intent: " + intent);
+        setIntent(intent);
+    }
+
+    public void processIntent(Intent intent) {
+        tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+    	IsoDep isotag = IsoDep.get(tag);
+    	if (isotag != null) {
+    		// We are waiting for the card, notify dialog
+    		if (currentState == State.WAITING_FOR_CARD) {
+    			cardMissingDialog.dismiss();
+    			gotoState(State.TEST_CARD_PRESENCE);
+    		}
+    	}
+    }
 
 	private void setCredentials(ArrayList<CredentialPackage> credentials) {
 		this.credentials = credentials;

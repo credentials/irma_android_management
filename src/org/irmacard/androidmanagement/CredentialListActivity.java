@@ -26,7 +26,6 @@ import net.sourceforge.scuba.smartcards.CardServiceException;
 import net.sourceforge.scuba.smartcards.IsoDepCardService;
 
 import org.irmacard.android.util.credentials.CredentialPackage;
-import org.irmacard.android.util.pindialog.EnterPINDialogFragment;
 import org.irmacard.androidmanagement.dialogs.CardMissingDialogFragment;
 import org.irmacard.androidmanagement.dialogs.ChangePinDialogFragment;
 import org.irmacard.androidmanagement.dialogs.ConfirmDeleteDialogFragment;
@@ -37,8 +36,6 @@ import org.irmacard.credentials.info.CredentialDescription;
 
 import org.irmacard.credentials.util.log.LogEntry;
 import org.irmacard.idemix.IdemixService;
-import org.irmacard.idemix.IdemixSmartcard;
-
 import android.app.DialogFragment;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -396,10 +393,8 @@ public class CredentialListActivity extends FragmentActivity implements
 
     private class CheckCardPresentTask extends AsyncTask<Tag, Void, TransmitResult> {
     	private final String TAG = "CheckCardPresentTask";
-    	private Context context;
 
 		protected CheckCardPresentTask(Context context) {
-    		this.context = context;
     	}
 
 		@Override
@@ -449,12 +444,10 @@ public class CredentialListActivity extends FragmentActivity implements
     private class TransmitAPDUsTask extends AsyncTask<Tag, Void, TransmitResult> {
     	private final String TAG = "TransmitAPDUsTask";
     	private String pin;
-    	private Context context;
     	private CardProgram cardProgram;
 
 		protected TransmitAPDUsTask(Context context, String pin,
 				CardProgram cardProgram) {
-    		this.context = context;
     		this.pin = pin;
     		this.cardProgram = cardProgram;
     	}

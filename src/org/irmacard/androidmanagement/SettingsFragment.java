@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 public class SettingsFragment extends Fragment {
 
@@ -49,5 +50,19 @@ public class SettingsFragment extends Fragment {
 	}
 	
 	public void onViewCreated(View view, Bundle savedInstanceState) {
+		// Card PIN listener
+		Button cardPINButton = (Button) view.findViewById(R.id.settings_change_card_pin_button);
+		cardPINButton.setOnClickListener(new View.OnClickListener() {
+		    public void onClick(View v){
+		    	((CredentialListActivity) getActivity()).onChangeCardPIN();;
+		    }
+		});
+
+		Button credPINButton = (Button) view.findViewById(R.id.settings_change_cred_pin_button);
+		credPINButton.setOnClickListener(new View.OnClickListener() {
+		    public void onClick(View v){
+		        ((CredentialListActivity) getActivity()).onChangeCredPIN();
+		    }
+		});
 	}
 }

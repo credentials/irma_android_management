@@ -28,6 +28,7 @@ import net.sourceforge.scuba.smartcards.IsoDepCardService;
 import org.irmacard.android.util.credentials.CredentialPackage;
 import org.irmacard.android.util.pindialog.EnterPINDialogFragment;
 import org.irmacard.androidmanagement.dialogs.CardMissingDialogFragment;
+import org.irmacard.androidmanagement.dialogs.ChangePinDialogFragment;
 import org.irmacard.androidmanagement.dialogs.ConfirmDeleteDialogFragment;
 import org.irmacard.androidmanagement.dialogs.ConfirmDeleteDialogFragment.ConfirmDeleteDialogListener;
 import org.irmacard.androidmanagement.util.TransmitResult;
@@ -36,6 +37,7 @@ import org.irmacard.credentials.info.CredentialDescription;
 
 import org.irmacard.credentials.util.log.LogEntry;
 import org.irmacard.idemix.IdemixService;
+import org.irmacard.idemix.IdemixSmartcard;
 
 import android.app.DialogFragment;
 import android.app.PendingIntent;
@@ -67,7 +69,8 @@ import android.util.Log;
  */
 public class CredentialListActivity extends FragmentActivity implements
 		MenuFragment.Callbacks, ConfirmDeleteDialogListener,
-		CardMissingDialogFragment.CardMissingDialogListener {
+		CardMissingDialogFragment.CardMissingDialogListener,
+		ChangePinDialogFragment.ChangePinDialogListener {
 
 	/**
 	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -110,7 +113,14 @@ public class CredentialListActivity extends FragmentActivity implements
 	private Action currentAction = Action.NONE;
 	private State currentState = State.NORMAL;
 	private DialogFragment cardMissingDialog;
+
+	// Needed to delete credentials
 	private CredentialDescription toBeDeleted;
+
+	// Needed to change PINs
+	private String old_pin;
+	private String new_pin;
+
 	private String cardPin;
 
 	@Override
@@ -304,6 +314,19 @@ public class CredentialListActivity extends FragmentActivity implements
 		gotoState(State.TEST_CARD_PRESENCE);
 	}
 
+	@Override
+	public void onPINChange(String old_pin, String new_pin) {
+		this.old_pin = old_pin;
+		this.new_pin = new_pin;
+		gotoState(State.PERFORM_ACTION);
+	}
+
+	@Override
+	public void onPINChangeCancel() {
+		// If cancelled we cannot continue, returning to normal
+		gotoState(State.NORMAL);
+	}
+
 	protected ArrayList<CredentialPackage> getCredentials() {
 		return credentials;
 	}
@@ -333,9 +356,27 @@ public class CredentialListActivity extends FragmentActivity implements
 			break;
 		case CONFIRM_ACTION:
 			Log.i(TAG, "Confirming action");
-			// For now we just handle deleting of credentials
-			ConfirmDeleteDialogFragment confirmDialog = ConfirmDeleteDialogFragment.getInstance(toBeDeleted);
-			confirmDialog.show(getFragmentManager(), "confirm_delete");
+			ChangePinDialogFragment pinDialog;
+
+			switch(currentAction) {
+			case DELETE_CREDENTIAL:
+				ConfirmDeleteDialogFragment confirmDialog = ConfirmDeleteDialogFragment.getInstance(toBeDeleted);
+				confirmDialog.show(getFragmentManager(), "confirm_delete");
+				break;
+			case CHANGE_CARD_PIN:
+				pinDialog = ChangePinDialogFragment.getInstance("card");
+				pinDialog.show(getFragmentManager(), "change_card_pin");
+				break;
+			case CHANGE_CREDENTIAL_PIN:
+				pinDialog = ChangePinDialogFragment.getInstance("credential");
+				pinDialog.show(getFragmentManager(), "change_cred_pin");
+				break;
+			case NONE:
+				Log.i(TAG, "Illegal state, returning to normal");
+				currentState = State.NORMAL;
+				break;
+			}
+
 			break;
 		case ACTION_FAILED:
 			Log.i(TAG, "Action failed");
@@ -480,6 +521,18 @@ public class CredentialListActivity extends FragmentActivity implements
 		gotoState(State.NORMAL);
 	}
 
+	public void onChangeCardPIN() {
+		Log.i(TAG, "Change card PIN called");
+		currentAction = Action.CHANGE_CARD_PIN;
+		gotoState(State.TEST_CARD_PRESENCE);
+	}
+
+	public void onChangeCredPIN() {
+		Log.i(TAG, "Change cred PIN called");
+		currentAction = Action.CHANGE_CREDENTIAL_PIN;
+		gotoState(State.TEST_CARD_PRESENCE);
+	}
+
 	public void runAction() {
 		CardProgram program = null;
 
@@ -490,6 +543,24 @@ public class CredentialListActivity extends FragmentActivity implements
 				public TransmitResult run(IdemixService is) throws CardServiceException {
 					IdemixCredentials ic = new IdemixCredentials(is);
 					ic.removeCredential(toBeDeleted);
+					return new TransmitResult(TransmitResult.Result.SUCCESS);
+				}
+			};
+			break;
+		case CHANGE_CARD_PIN:
+			program = new CardProgram() {
+				@Override
+				public TransmitResult run(IdemixService is) throws CardServiceException {
+					is.updateCardPin(old_pin.getBytes(), new_pin.getBytes());
+					return new TransmitResult(TransmitResult.Result.SUCCESS);
+				}
+			};
+			break;
+		case CHANGE_CREDENTIAL_PIN:
+			program = new CardProgram() {
+				@Override
+				public TransmitResult run(IdemixService is) throws CardServiceException {
+					is.updateCredentialPin(old_pin.getBytes(), new_pin.getBytes());
 					return new TransmitResult(TransmitResult.Result.SUCCESS);
 				}
 			};
@@ -540,4 +611,5 @@ public class CredentialListActivity extends FragmentActivity implements
 
 		gotoState(State.TEST_CARD_PRESENCE);
 	}
+
 }

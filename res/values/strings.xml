@@ -22,7 +22,17 @@
     <string name="status_loading_credentials">Loading credentials&#8230;</string>
     <string name="credential_no_longer_valid">No longer valid</string>
     <string name="pinmessage">Please enter maintenance PIN</string>
+
     <string name="pinhint">Maintenance PIN</string>
+    <string name="old_pin_hint">Old PIN</string>
+    <string name="new_pin_hint">New PIN</string>
+
+    <string name="old_pin_message">Enter Old PIN:</string>
+    <string name="new_pin_message">Enter New PIN:</string>
+    <string name="new_pin_again_message">Retype New PIN:</string>
+
+    <string name="pins_unequal">New PINs do not match. Please try again.</string>
+
     <string name="log_button_text">Logs</string>
     <string name="settings_button_text">Settings</string>
     <string name="no_logs_available">no log items found</string>

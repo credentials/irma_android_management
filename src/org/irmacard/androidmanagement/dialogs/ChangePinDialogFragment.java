@@ -16,8 +16,13 @@ import android.widget.TextView;
 
 public class ChangePinDialogFragment extends DialogFragment {
 	private static final String EXTRA_PIN_NAME = "AndroidManagement.ChangePinDialog.pinname";
-	
+	private static final String EXTRA_TRIES = "AndroidManagement.ChangePinDialog.tries";
+	private static final String EXTRA_NEW_PIN = "AndroidManagement.ChangePinDialog.new_pin";
+
 	private String pinName;
+	private int tries;
+	private String newPin;
+
     private Boolean canceled;
     private Boolean error = false;
     
@@ -33,11 +38,13 @@ public class ChangePinDialogFragment extends DialogFragment {
 	
 	ChangePinDialogListener mListener;
 	
-	public static ChangePinDialogFragment getInstance(String pinName) {
+	public static ChangePinDialogFragment getInstance(String pinName, int tries, String new_pin) {
         ChangePinDialogFragment f = new ChangePinDialogFragment();
 
         Bundle args = new Bundle();
         args.putString(EXTRA_PIN_NAME, pinName);
+        args.putInt(EXTRA_TRIES, tries);
+        args.putString(EXTRA_NEW_PIN, new_pin);
         f.setArguments(args);
 
         return f;
@@ -48,6 +55,10 @@ public class ChangePinDialogFragment extends DialogFragment {
     	super.onCreate(savedInstanceState);
 
 		pinName = getArguments().getString(EXTRA_PIN_NAME);
+		tries = getArguments().getInt(EXTRA_TRIES);
+		newPin = getArguments().getString(EXTRA_NEW_PIN);
+		
+		Log.i("Blaat", "Tries: " + tries);
     }
 	
     @Override
@@ -73,8 +84,19 @@ public class ChangePinDialogFragment extends DialogFragment {
         new_pin_again_field = (EditText) dialogView.findViewById(R.id.new_pin_code_again);
         error_field = (TextView) dialogView.findViewById(R.id.changepin_error);
         
-        if(error) {
+        if(error || tries != -1) {
         	error_field.setVisibility(View.VISIBLE);
+
+        	if(error) {
+        		error_field.setText(R.string.pins_unequal);
+        	} else {
+				// Report number of tries
+				error_field.setText(String.format(
+						getResources().getString(R.string.change_pin_tries),
+						tries));
+				new_pin_field.setText(newPin);
+				new_pin_again_field.setText(newPin);
+        	}
         } else {
         	error_field.setVisibility(View.GONE);
         }

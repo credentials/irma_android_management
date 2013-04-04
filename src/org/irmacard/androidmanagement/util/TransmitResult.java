@@ -26,6 +26,7 @@ public class TransmitResult {
 
 	private Result result;
 	private Exception exception = null;
+	private int tries = -1;
 
 	public TransmitResult(Exception exception) {
 		this.result = Result.FAILURE;
@@ -36,11 +37,20 @@ public class TransmitResult {
 		this.result = result;
 	}
 
+	public TransmitResult(int tries) {
+		this.result = Result.INCORRECT_PIN;
+		this.tries = tries;
+	}
+
 	public Result getResult() {
 		return result;
 	}
 
 	public Exception getException() {
 		return exception;
+	}
+
+	public int getTries() {
+		return tries;
 	}
 }

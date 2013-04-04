@@ -117,6 +117,7 @@ public class CredentialListActivity extends FragmentActivity implements
 	// Needed to change PINs
 	private String old_pin;
 	private String new_pin;
+	private int tries;
 
 	private String cardPin;
 
@@ -344,6 +345,10 @@ public class CredentialListActivity extends FragmentActivity implements
 			break;
 		case TEST_CARD_PRESENCE:
 			Log.i(TAG, "Checking card presence");
+
+			// This is the start of a new action so we should reset some state
+			tries = -1;
+
 			new CheckCardPresentTask(this).execute(tag);
 			break;
 		case WAITING_FOR_CARD:
@@ -361,11 +366,11 @@ public class CredentialListActivity extends FragmentActivity implements
 				confirmDialog.show(getFragmentManager(), "confirm_delete");
 				break;
 			case CHANGE_CARD_PIN:
-				pinDialog = ChangePinDialogFragment.getInstance("card");
+				pinDialog = ChangePinDialogFragment.getInstance("card", tries, new_pin);
 				pinDialog.show(getFragmentManager(), "change_card_pin");
 				break;
 			case CHANGE_CREDENTIAL_PIN:
-				pinDialog = ChangePinDialogFragment.getInstance("credential");
+				pinDialog = ChangePinDialogFragment.getInstance("credential", tries, new_pin);
 				pinDialog.show(getFragmentManager(), "change_cred_pin");
 				break;
 			case NONE:
@@ -443,12 +448,9 @@ public class CredentialListActivity extends FragmentActivity implements
 
     private class TransmitAPDUsTask extends AsyncTask<Tag, Void, TransmitResult> {
     	private final String TAG = "TransmitAPDUsTask";
-    	private String pin;
     	private CardProgram cardProgram;
 
-		protected TransmitAPDUsTask(Context context, String pin,
-				CardProgram cardProgram) {
-    		this.pin = pin;
+		protected TransmitAPDUsTask(Context context, CardProgram cardProgram) {
     		this.cardProgram = cardProgram;
     	}
 
@@ -464,7 +466,7 @@ public class CredentialListActivity extends FragmentActivity implements
 
 			try {
 				is.open();
-				is.sendCardPin(pin.getBytes());
+
 
 				Log.i(TAG,"Performing requested actions now");
 				result = cardProgram.run(is);
@@ -494,12 +496,19 @@ public class CredentialListActivity extends FragmentActivity implements
 				gotoState(State.ACTION_PERFORMED);
 				break;
 			case FAILURE:
+				// TODO: notify user
 				Log.i(TAG, "Action failed, notifying user");
 				gotoState(State.ACTION_FAILED);
 				break;
 			case INCORRECT_PIN:
 				Log.i(TAG, "Pincode incorrect, notifying user");
-				gotoState(State.NORMAL);
+				tries = tresult.getTries();
+				if(tries > 0) {
+					gotoState(State.CONFIRM_ACTION);
+				} else {
+					// TODO: deal with pin expiry, notify user.
+					gotoState(State.ACTION_FAILED);
+				}
 			}
 		}
     }
@@ -534,6 +543,7 @@ public class CredentialListActivity extends FragmentActivity implements
 			program = new CardProgram() {
 				@Override
 				public TransmitResult run(IdemixService is) throws CardServiceException {
+					is.sendCardPin(cardPin.getBytes());
 					IdemixCredentials ic = new IdemixCredentials(is);
 					ic.removeCredential(toBeDeleted);
 					return new TransmitResult(TransmitResult.Result.SUCCESS);
@@ -544,8 +554,19 @@ public class CredentialListActivity extends FragmentActivity implements
 			program = new CardProgram() {
 				@Override
 				public TransmitResult run(IdemixService is) throws CardServiceException {
-					is.updateCardPin(old_pin.getBytes(), new_pin.getBytes());
-					return new TransmitResult(TransmitResult.Result.SUCCESS);
+					int tries;
+					tries = is.sendCardPin(old_pin.getBytes());
+
+					// Only continu if Card Pin was correct initially
+					if(tries == -1) {
+						tries = is.updateCardPin(old_pin.getBytes(), new_pin.getBytes());
+					}
+
+					if (tries == -1) {
+						return new TransmitResult(TransmitResult.Result.SUCCESS);
+					} else {
+						return new TransmitResult(tries);
+					}
 				}
 			};
 			break;
@@ -553,13 +574,18 @@ public class CredentialListActivity extends FragmentActivity implements
 			program = new CardProgram() {
 				@Override
 				public TransmitResult run(IdemixService is) throws CardServiceException {
-					is.updateCredentialPin(old_pin.getBytes(), new_pin.getBytes());
-					return new TransmitResult(TransmitResult.Result.SUCCESS);
+					is.sendCardPin(cardPin.getBytes());
+					int tries = is.updateCredentialPin(old_pin.getBytes(), new_pin.getBytes());
+					if (tries == -1) {
+						return new TransmitResult(TransmitResult.Result.SUCCESS);
+					} else {
+						return new TransmitResult(tries);
+					}
 				}
 			};
 			break;
 		}
-		new TransmitAPDUsTask(this, cardPin, program).execute(tag);
+		new TransmitAPDUsTask(this, program).execute(tag);
 	}
 
 	public void completeAction() {
@@ -593,6 +619,10 @@ public class CredentialListActivity extends FragmentActivity implements
 						.replace(R.id.credential_detail_container, initFragment)
 						.commit();
 			}
+			break;
+		case CHANGE_CARD_PIN:
+			// We need to cache the new PIN now
+			cardPin = new_pin;
 		}
 	}
 

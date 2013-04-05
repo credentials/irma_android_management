@@ -25,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class SettingsFragment extends Fragment {
 
@@ -64,5 +65,10 @@ public class SettingsFragment extends Fragment {
 		        ((CredentialListActivity) getActivity()).onChangeCredPIN();
 		    }
 		});
+
+		TextView version_field = (TextView) view
+				.findViewById(R.id.settings_card_version_text);
+		version_field.setText(((CredentialListActivity) getActivity())
+				.getCardVersion().toString());
 	}
 }

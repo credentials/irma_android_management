@@ -35,6 +35,7 @@ import org.irmacard.androidmanagement.util.TransmitResult;
 import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.info.CredentialDescription;
 
+import org.irmacard.credentials.util.CardVersion;
 import org.irmacard.credentials.util.log.LogEntry;
 import org.irmacard.idemix.IdemixService;
 import android.app.DialogFragment;
@@ -125,6 +126,7 @@ public class CredentialListActivity extends FragmentActivity implements
 	private Exception exception;
 
 	private String cardPin;
+	private CardVersion cardVersion;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -147,6 +149,7 @@ public class CredentialListActivity extends FragmentActivity implements
 		setTag(tag);
 
 		cardPin = (String) intent.getSerializableExtra(WaitingForCardActivity.EXTRA_CARD_PIN);
+		cardVersion = (CardVersion) intent.getSerializableExtra(WaitingForCardActivity.EXTRA_CARD_VERSION);
 
 		setContentView(R.layout.activity_credential_list);
 
@@ -336,6 +339,10 @@ public class CredentialListActivity extends FragmentActivity implements
 
 	public ArrayList<LogEntry> getLogs() {
 		return logs;
+	}
+
+	public CardVersion getCardVersion() {
+		return cardVersion;
 	}
 
 	private void gotoState(State state) {

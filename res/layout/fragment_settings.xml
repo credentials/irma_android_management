@@ -21,6 +21,26 @@
         android:orientation="vertical"
         tools:context=".CredentialDetailFragment" >
         
+        <!-- Card Version -->
+
+        <TextView
+            android:id="@+id/settings_card_version_heading"
+            style="@style/DetailHeading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/card_version_heading"
+            android:textIsSelectable="true" />
+
+        <TextView
+            android:id="@+id/settings_card_version_text"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/settings_card_version_heading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textIsSelectable="true" />
+
         <!-- Card Pin -->
 
         <TextView
@@ -29,7 +49,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
+            android:layout_marginTop="32dp"
+            android:layout_below="@id/settings_card_version_text"
             android:text="@string/card_pin_heading"
             android:textIsSelectable="true" />
         

@@ -35,6 +35,7 @@ import org.irmacard.credentials.idemix.util.CredentialInformation;
 import org.irmacard.credentials.info.CredentialDescription;
 import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.credentials.info.InfoException;
+import org.irmacard.credentials.util.CardVersion;
 import org.irmacard.credentials.util.log.LogEntry;
 import org.irmacard.idemix.IdemixService;
 
@@ -79,16 +80,21 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
     public static final String EXTRA_LOG_ENTRIES = "org.irmacard.androidmanagement.log_entries";
     public static final String EXTRA_TAG = "org.irmacard.androidmanagement.tag";
     public static final String EXTRA_CARD_PIN = "org.irmacard.androidmanagement.cardpin";
+    public static final String EXTRA_CARD_VERSION = "org.irmacard.androidmanagement.cardversion";
 
 	private class CardData {
 		public ArrayList<CredentialPackage> credentials;
 		public ArrayList<LogEntry> logs;
+		public CardVersion cardVersion;
+
 		public Exception e;
 		public int tries = -1;
 
-		public CardData(ArrayList<CredentialPackage> credentials, ArrayList<LogEntry> logs) {
+		public CardData(ArrayList<CredentialPackage> credentials, ArrayList<LogEntry> logs, CardVersion cardVersion) {
 			this.credentials = credentials;
 			this.logs = logs;
+			this.cardVersion = cardVersion;
+
 			this.e = null;
 		}
 
@@ -246,6 +252,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 		protected CardData doInBackground(IsoDep... arg0) {
 			ArrayList<CredentialPackage> credentialpks = new ArrayList<CredentialPackage>();
 			ArrayList<LogEntry> logs = new ArrayList<LogEntry>();
+			CardVersion cardVersion = null;
 
 			IsoDep tag = arg0[0];
 			
@@ -257,6 +264,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 			
 			try {
 				ic.connect();
+				cardVersion = ic.getCardVersion();
 				tries = is.sendCardPin(pin.getBytes());
 
 				if(tries != -1) {
@@ -294,7 +302,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 				}
 			}
 
-			return new CardData(credentialpks, logs);
+			return new CardData(credentialpks, logs, cardVersion);
 		}
 		
 		@Override
@@ -309,6 +317,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 				intent.putExtra(EXTRA_LOG_ENTRIES, data.logs);
 				intent.putExtra(EXTRA_TAG, tag);
 				intent.putExtra(EXTRA_CARD_PIN, pin);
+				intent.putExtra(EXTRA_CARD_VERSION, data.cardVersion);
 				tries = -1;
 				startActivity(intent);
 			} else {

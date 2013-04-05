@@ -60,6 +60,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 	private String[][] mTechLists;
 	private Tag tag;
 	private IsoDep isotag;
+	private int tries = -1;
 	
 	private final String TAG = "WaitingForCard";
 	
@@ -155,9 +156,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
     		
     		// Make sure we're not already communicating with a card
     		if (activityState == STATE_IDLE) {
-    			setState(STATE_WAITING_PIN);
-    			DialogFragment pinDialog = new EnterPINDialogFragment();
-    			pinDialog.show(getFragmentManager(), "pinentry");
+    			askForPin();
     		}
     		
         	if (activityState == STATE_DISPLAYING) {
@@ -165,6 +164,12 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
         		setState(STATE_IDLE);
         	}
     	}
+    }
+    
+    private void askForPin() {
+		setState(STATE_WAITING_PIN);
+		DialogFragment pinDialog = EnterPINDialogFragment.getInstance(tries);
+		pinDialog.show(getFragmentManager(), "pinentry");
     }
     
     public void setState(int state) {
@@ -227,7 +232,12 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 			
 			try {
 				ic.connect();
-				is.sendCardPin(pin.getBytes());
+				tries = is.sendCardPin(pin.getBytes());
+
+				if(tries != -1) {
+					// Pin-code incorrect, returning
+					return null;
+				}
 
 				Log.i(TAG,"Retrieving credentials now"); 
 				List<CredentialDescription> credentials = ic.getCredentials();
@@ -274,9 +284,17 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 				intent.putExtra(EXTRA_LOG_ENTRIES, data.logs);
 				intent.putExtra(EXTRA_TAG, tag);
 				intent.putExtra(EXTRA_CARD_PIN, pin);
+				tries = -1;
 				startActivity(intent);
 			} else {
-				setState(STATE_IDLE);
+				if(tries != -1) {
+					// Password was incorrect, notify user
+					askForPin();
+				} else {
+					// Notify user of error
+					// TODO: implement
+					setState(STATE_IDLE);
+				}
 			}
 		}
     }

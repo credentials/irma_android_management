@@ -28,6 +28,7 @@ import net.sourceforge.scuba.smartcards.IsoDepCardService;
 import org.irmacard.android.util.credentials.AndroidWalker;
 import org.irmacard.android.util.credentials.CredentialPackage;
 import org.irmacard.android.util.pindialog.EnterPINDialogFragment;
+import org.irmacard.androidmanagement.dialogs.AlertDialogFragment;
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.idemix.util.CredentialInformation;
@@ -53,7 +54,7 @@ import android.view.Menu;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class WaitingForCardActivity extends Activity implements EnterPINDialogFragment.PINDialogListener {
+public class WaitingForCardActivity extends Activity implements EnterPINDialogFragment.PINDialogListener, AlertDialogFragment.AlertDialogListener {
 	private NfcAdapter nfcA;
 	private PendingIntent mPendingIntent;
 	private IntentFilter[] mFilters;
@@ -68,6 +69,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 	private static final int STATE_WAITING_PIN = 1;
 	private static final int STATE_CHECKING = 2;
 	private static final int STATE_DISPLAYING = 3;
+	private static final int STATE_ERROR = 4;
 	private int activityState = STATE_IDLE;
 	
     public static final byte[] DEFAULT_PIN = {0x30, 0x30, 0x30, 0x30};
@@ -81,10 +83,20 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 	private class CardData {
 		public ArrayList<CredentialPackage> credentials;
 		public ArrayList<LogEntry> logs;
+		public Exception e;
 
 		public CardData(ArrayList<CredentialPackage> credentials, ArrayList<LogEntry> logs) {
 			this.credentials = credentials;
 			this.logs = logs;
+			this.e = null;
+		}
+
+		public CardData(Exception e){
+			this.e = e;
+		}
+
+		public boolean isSuccesful() {
+			return e == null;
 		}
 	}
 
@@ -193,6 +205,12 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
     		Log.i(TAG, "Changing status to WAITING_PIN");
     		imageResource = R.drawable.irma_icon_card_found_520px;
     		statusTextResource = R.string.status_waiting_for_pin;
+    		break;
+    	case STATE_ERROR:
+    		Log.i(TAG, "Changing status to ERROR");
+    		imageResource = R.drawable.irma_icon_warning_520px;
+    		statusTextResource = R.string.status_error;
+    		break;
     	}
     	
     	((TextView) findViewById(R.id.statustext)).setText(statusTextResource);
@@ -236,7 +254,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 
 				if(tries != -1) {
 					// Pin-code incorrect, returning
-					return null;
+					return new CardData(null);
 				}
 
 				Log.i(TAG,"Retrieving credentials now"); 
@@ -259,7 +277,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 			} catch (Exception e) {
 				Log.e(TAG, "Reading verification caused exception");
 				e.printStackTrace();
-				return null;
+				return new CardData(e);
 			} finally {
 				try {
 					tag.close();
@@ -277,7 +295,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 			Log.i(TAG, "On post execute now with nice results");
 			activityState = STATE_DISPLAYING;
 			
-			if(data != null) {
+			if(data.isSuccesful()) {
 				// Move to CredentialListActivity
 				Intent intent = new Intent(context, CredentialListActivity.class);
 				intent.putExtra(EXTRA_CREDENTIAL_PACKAGES, data.credentials);
@@ -292,8 +310,9 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 					askForPin();
 				} else {
 					// Notify user of error
-					// TODO: implement
-					setState(STATE_IDLE);
+					AlertDialogFragment f = AlertDialogFragment.getInstance("Card Error", data.e.getMessage());
+					f.show(getFragmentManager(), "alert");
+					setState(STATE_ERROR);
 				}
 			}
 		}
@@ -309,6 +328,11 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 	@Override
 	public void onPINCancel() {
 		Log.i(TAG, "Pin entry canceled!");
+		setState(STATE_IDLE);
+	}
+
+	@Override
+	public void onAlertDismiss() {
 		setState(STATE_IDLE);
 	}
 

@@ -26,6 +26,7 @@ import net.sourceforge.scuba.smartcards.CardServiceException;
 import net.sourceforge.scuba.smartcards.IsoDepCardService;
 
 import org.irmacard.android.util.credentials.CredentialPackage;
+import org.irmacard.androidmanagement.dialogs.AlertDialogFragment;
 import org.irmacard.androidmanagement.dialogs.CardMissingDialogFragment;
 import org.irmacard.androidmanagement.dialogs.ChangePinDialogFragment;
 import org.irmacard.androidmanagement.dialogs.ConfirmDeleteDialogFragment;
@@ -67,7 +68,8 @@ import android.util.Log;
 public class CredentialListActivity extends FragmentActivity implements
 		MenuFragment.Callbacks, ConfirmDeleteDialogListener,
 		CardMissingDialogFragment.CardMissingDialogListener,
-		ChangePinDialogFragment.ChangePinDialogListener {
+		ChangePinDialogFragment.ChangePinDialogListener,
+		AlertDialogFragment.AlertDialogListener {
 
 	/**
 	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -118,6 +120,9 @@ public class CredentialListActivity extends FragmentActivity implements
 	private String old_pin;
 	private String new_pin;
 	private int tries;
+
+	// Deal properly with failures
+	private Exception exception;
 
 	private String cardPin;
 
@@ -382,7 +387,9 @@ public class CredentialListActivity extends FragmentActivity implements
 			break;
 		case ACTION_FAILED:
 			Log.i(TAG, "Action failed");
-			// TODO notify user
+			AlertDialogFragment f = AlertDialogFragment.getInstance(
+					"Action Failed", exception.getMessage());
+			f.show(getFragmentManager(), "alert");
 			break;
 		case ACTION_PERFORMED:
 			Log.i(TAG, "Action succeeded");
@@ -496,8 +503,8 @@ public class CredentialListActivity extends FragmentActivity implements
 				gotoState(State.ACTION_PERFORMED);
 				break;
 			case FAILURE:
-				// TODO: notify user
 				Log.i(TAG, "Action failed, notifying user");
+				exception = tresult.getException();
 				gotoState(State.ACTION_FAILED);
 				break;
 			case INCORRECT_PIN:
@@ -506,7 +513,7 @@ public class CredentialListActivity extends FragmentActivity implements
 				if(tries > 0) {
 					gotoState(State.CONFIRM_ACTION);
 				} else {
-					// TODO: deal with pin expiry, notify user.
+					exception = new Exception("You have no more pin tries left, the card is now blocked");
 					gotoState(State.ACTION_FAILED);
 				}
 			}
@@ -633,6 +640,12 @@ public class CredentialListActivity extends FragmentActivity implements
 		Log.i("blaat", "Will delete: " + cd.toString());
 
 		gotoState(State.TEST_CARD_PRESENCE);
+	}
+
+	@Override
+	public void onAlertDismiss() {
+		// Returning to normal state
+		gotoState(State.NORMAL);
 	}
 
 }

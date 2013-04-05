@@ -84,6 +84,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 		public ArrayList<CredentialPackage> credentials;
 		public ArrayList<LogEntry> logs;
 		public Exception e;
+		public int tries = -1;
 
 		public CardData(ArrayList<CredentialPackage> credentials, ArrayList<LogEntry> logs) {
 			this.credentials = credentials;
@@ -95,8 +96,12 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 			this.e = e;
 		}
 
+		public CardData(int tries) {
+			this.tries = tries;
+		}
+
 		public boolean isSuccesful() {
-			return e == null;
+			return e == null && tries == -1;
 		}
 	}
 
@@ -113,9 +118,11 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 	    try {
 			DescriptionStore.getInstance();
 		} catch (InfoException e) {
-			// TODO Auto-generated catch block
 			Log.e("error", "something went wrong");
 			e.printStackTrace();
+			AlertDialogFragment f = AlertDialogFragment.getInstance("Cannot load Description Store", e.getMessage());
+			f.show(getFragmentManager(), "alert");
+			setState(STATE_ERROR);
 		}
 		
         // NFC stuff
@@ -254,7 +261,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 
 				if(tries != -1) {
 					// Pin-code incorrect, returning
-					return new CardData(null);
+					return new CardData(tries);
 				}
 
 				Log.i(TAG,"Retrieving credentials now"); 
@@ -292,11 +299,11 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 		
 		@Override
 		protected void onPostExecute(CardData data) {
-			Log.i(TAG, "On post execute now with nice results");
 			activityState = STATE_DISPLAYING;
 			
 			if(data.isSuccesful()) {
 				// Move to CredentialListActivity
+				Log.i(TAG, "Post Excecute, got all data succesfully");
 				Intent intent = new Intent(context, CredentialListActivity.class);
 				intent.putExtra(EXTRA_CREDENTIAL_PACKAGES, data.credentials);
 				intent.putExtra(EXTRA_LOG_ENTRIES, data.logs);
@@ -306,10 +313,18 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 				startActivity(intent);
 			} else {
 				if(tries != -1) {
-					// Password was incorrect, notify user
-					askForPin();
+					Log.i(TAG, "Pin incorect, " + tries + " left.");
+					if(tries > 0) {
+						askForPin();
+					} else {
+						AlertDialogFragment f = AlertDialogFragment.getInstance("PIN Error", "You have no more pin tries left!");
+						f.show(getFragmentManager(), "alert");
+						tries = -1;
+						setState(STATE_ERROR);
+					}
 				} else {
 					// Notify user of error
+					Log.i(TAG, "General error occurred");
 					AlertDialogFragment f = AlertDialogFragment.getInstance("Card Error", data.e.getMessage());
 					f.show(getFragmentManager(), "alert");
 					setState(STATE_ERROR);

@@ -456,6 +456,9 @@ public class CredentialListActivity extends FragmentActivity implements
 			case SUCCESS:
 				gotoState(State.CONFIRM_ACTION);
 				break;
+			default:
+				// Nothing to do?
+				break;
 			}
 		}
     }
@@ -598,6 +601,9 @@ public class CredentialListActivity extends FragmentActivity implements
 				}
 			};
 			break;
+		default:
+			// Nothing to do?
+			break;
 		}
 		new TransmitAPDUsTask(this, program).execute(tag);
 	}
@@ -637,6 +643,10 @@ public class CredentialListActivity extends FragmentActivity implements
 		case CHANGE_CARD_PIN:
 			// We need to cache the new PIN now
 			cardPin = new_pin;
+			break;
+		default:
+			// Nothing to do?
+			break;
 		}
 	}
 

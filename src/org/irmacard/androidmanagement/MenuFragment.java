@@ -25,6 +25,7 @@ public class MenuFragment extends Fragment {
 	private CredentialListAdapter listAdapter;
 	private ArrayList<CredentialPackage> credentials = null;
 	private ListView listView;
+	private View rootView;
 	private Button log_button;
 	private Button settings_button;
 	private boolean mTwoPane;
@@ -113,24 +114,28 @@ public class MenuFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		Log.i("menu", "Inflating fragment layout");
-		View rootView = inflater.inflate(R.layout.fragment_menu,
+		rootView = inflater.inflate(R.layout.fragment_menu,
 				container, false);
 
+		setNoItemsIfNecessary();
+
+		Log.i("menu", "Done inflating fragment layout");
+
+		mTwoPane = rootView.findViewById(R.id.credential_menu_log_button ) != null;
+		return rootView;
+	}
+
+	private void setNoItemsIfNecessary() {
 		ListView list = (ListView) rootView.findViewById(R.id.credential_menu_list);
 		TextView no_items = (TextView) rootView.findViewById(R.id.credentials_menu_no_creds);
 
-		if(credentials.isEmpty()) {
+		if(credentials == null || credentials.isEmpty()) {
 			list.setVisibility(View.INVISIBLE);
 			no_items.setVisibility(View.VISIBLE);
 		} else {
 			list.setVisibility(View.VISIBLE);
 			no_items.setVisibility(View.INVISIBLE);
 		}
-
-		Log.i("menu", "Done inflating fragment layout");
-
-		mTwoPane = rootView.findViewById(R.id.credential_menu_log_button ) != null;
-		return rootView;
 	}
 	
 	public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -223,5 +228,6 @@ public class MenuFragment extends Fragment {
 	public void updateList() {
 		Log.i("Blaat", "Notifying list of update!!");
 		listAdapter.notifyDataSetChanged();
+		setNoItemsIfNecessary();
 	}
 }

@@ -47,4 +47,7 @@
     <string name="credential_pin_text">You need your credential PIN in order to use certain credentials on your card.</string>
     <string name="change_pin">Change PIN</string>
     <string name="card_version_heading">Card Version</string>
+
+    <string name="menu_settings">Settings</string>
+    <string name="menu_logs">Logs</string>
 </resources>

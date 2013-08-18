@@ -50,6 +50,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 /**
  * An activity representing a list of Credentials. This activity has different
@@ -174,6 +177,9 @@ public class CredentialListActivity extends FragmentActivity implements
 			Log.i("blaat", "Simulating initial click!!");
 			((MenuFragment) getSupportFragmentManager()
 					.findFragmentById(R.id.credential_menu_fragment)).simulateListClick(0);
+			
+			// Do not show action bar in two-pane mode
+			getActionBar().hide();
 		}
 
         // NFC stuff
@@ -212,6 +218,29 @@ public class CredentialListActivity extends FragmentActivity implements
     public void onNewIntent(Intent intent) {
         Log.i(TAG, "Discovered tag with intent: " + intent);
         setIntent(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	// Menu is only inflated in single pane mode
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return !mTwoPane;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.menu_history:
+        	onLogSelected();
+        	return true;
+        case R.id.menu_settings:
+        	onSettingsSelected();
+        	return true;
+        default:
+        	return super.onOptionsItemSelected(item);
+        }
     }
 
     public void processIntent(Intent intent) {

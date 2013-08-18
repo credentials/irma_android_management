@@ -39,7 +39,7 @@ public class SettingsActivity extends FragmentActivity implements SettingsFragme
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_log);
+		setContentView(R.layout.activity_settings);
 
 		// Show the Up button in the action bar.
 		if(getActionBar() != null) {

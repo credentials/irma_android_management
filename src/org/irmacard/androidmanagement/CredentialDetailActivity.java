@@ -20,6 +20,7 @@
 package org.irmacard.androidmanagement;
 
 import org.irmacard.android.util.credentials.CredentialPackage;
+import org.irmacard.credentials.info.CredentialDescription;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,8 +37,12 @@ import android.view.MenuItem;
  * This activity is mostly just a 'shell' activity containing nothing more than
  * a {@link CredentialDetailFragment}.
  */
-public class CredentialDetailActivity extends FragmentActivity {
+public class CredentialDetailActivity extends FragmentActivity implements
+		CredentialDetailFragment.Callbacks {
 	CredentialPackage credential;
+
+	public static final String ARG_RESULT_DELETE = "deletedCred";
+	public static final int RESULT_DELETE = RESULT_FIRST_USER;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,5 +93,13 @@ public class CredentialDetailActivity extends FragmentActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onDeleteCredential(CredentialDescription cd) {
+		Intent data = new Intent(this, CredentialDetailActivity.class);
+		data.putExtra(CredentialDetailActivity.ARG_RESULT_DELETE, cd);
+		setResult(RESULT_DELETE, data);
+		finish();
 	}
 }

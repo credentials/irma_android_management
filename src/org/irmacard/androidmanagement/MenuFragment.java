@@ -219,4 +219,9 @@ public class MenuFragment extends Fragment {
 		}
 		mCallbacks.onItemSelected(credentials.get(position).getCredentialDescription().getId());
 	}
+
+	public void updateList() {
+		Log.i("Blaat", "Notifying list of update!!");
+		listAdapter.notifyDataSetChanged();
+	}
 }

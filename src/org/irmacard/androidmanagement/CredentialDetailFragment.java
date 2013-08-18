@@ -30,11 +30,11 @@ import org.irmacard.android.util.credentials.CredentialPackage;
 import org.irmacard.androidmanagement.adapters.CredentialAttributeAdapter;
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.info.AttributeDescription;
+import org.irmacard.credentials.info.CredentialDescription;
 import org.irmacard.credentials.info.IssuerDescription;
 
-import android.content.Context;
+import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -44,7 +44,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 /**
@@ -60,11 +59,19 @@ public class CredentialDetailFragment extends Fragment {
 	public static final String ARG_ITEM_ID = "item_id";
 	public static final String ARG_ITEM = "item";
 	
+	public interface Callbacks {
+		/**
+		 * Callback when credential has to be deleted
+		 */
+		void onDeleteCredential(CredentialDescription cd);
+	}
+
 	CredentialAttributeAdapter mAdapter;
 	CredentialPackage credential;
 	AndroidWalker aw;
 
 	private LayoutInflater inflater;
+	private org.irmacard.androidmanagement.CredentialDetailFragment.Callbacks mCallbacks;
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -167,9 +174,21 @@ public class CredentialDetailFragment extends Fragment {
 		});
 	}
 
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+
+		// Activities containing this fragment must implement its callbacks.
+		if (!(activity instanceof Callbacks)) {
+			throw new IllegalStateException(
+					"Activity must implement fragment's callbacks.");
+		}
+
+		mCallbacks = (Callbacks) activity;
+	}
+
 	private void clickedDeleteButton() {
 		Log.i("blaat", "Delete button clicked");
-		((CredentialListActivity) getActivity()).deleteCredential(credential
-				.getCredentialDescription());
+		mCallbacks.onDeleteCredential(credential.getCredentialDescription());
 	}
 }

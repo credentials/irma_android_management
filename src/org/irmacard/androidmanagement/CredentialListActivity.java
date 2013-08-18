@@ -73,7 +73,8 @@ public class CredentialListActivity extends FragmentActivity implements
 		MenuFragment.Callbacks, ConfirmDeleteDialogListener,
 		CardMissingDialogFragment.CardMissingDialogListener,
 		ChangePinDialogFragment.ChangePinDialogListener,
-		AlertDialogFragment.AlertDialogListener {
+		AlertDialogFragment.AlertDialogListener,
+		CredentialDetailFragment.Callbacks {
 
 	/**
 	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -132,7 +133,8 @@ public class CredentialListActivity extends FragmentActivity implements
 	private CardVersion cardVersion;
 
 	// Requests
-	private int SETTINGS_REQUEST;
+	private int SETTINGS_REQUEST = 11;
+	private int DETAIL_REQUEST = 12;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -302,7 +304,7 @@ public class CredentialListActivity extends FragmentActivity implements
 			Intent detailIntent = new Intent(this,
 					CredentialDetailActivity.class);
 			detailIntent.putExtra(CredentialDetailFragment.ARG_ITEM, credential);
-			startActivity(detailIntent);
+			startActivityForResult(detailIntent, DETAIL_REQUEST);
 		}
 	}
 	
@@ -366,6 +368,12 @@ public class CredentialListActivity extends FragmentActivity implements
 				onChangeCardPIN();
 			else if(resultCode == SettingsActivity.RESULT_CHANGE_CRED_PIN)
 				onChangeCredPIN();
+		} else if(requestCode == DETAIL_REQUEST) {
+			if (resultCode == CredentialDetailActivity.RESULT_DELETE) {
+				CredentialDescription cd = (CredentialDescription) data
+						.getSerializableExtra(CredentialDetailActivity.ARG_RESULT_DELETE);
+				onDeleteCredential(cd);
+			}
 		}
 	}
 
@@ -597,6 +605,10 @@ public class CredentialListActivity extends FragmentActivity implements
 	@Override
 	public void onConfirmDeleteCancel() {
 		gotoState(State.NORMAL);
+		// If in twoPane mode return to detailed view upon cancel
+		if(!mTwoPane) {
+			onItemSelected(toBeDeleted.getId());
+		}
 	}
 
 	public void onChangeCardPIN() {
@@ -677,7 +689,8 @@ public class CredentialListActivity extends FragmentActivity implements
 			int deletedIdx = -1;
 			for(int i = 0 ; i <  credentials.size(); i++) {
 				CredentialPackage cp = credentials.get(i);
-				if(cp.getCredentialDescription().equals(toBeDeleted)) {
+				System.out.println("Examining credential: " + cp.toString());
+				if(cp.getCredentialDescription().getId() == toBeDeleted.getId()) {
 					deletedIdx = i;
 				}
 			}
@@ -688,15 +701,20 @@ public class CredentialListActivity extends FragmentActivity implements
 				credentials.remove(deletedIdx);
 			}
 
-			if(credentials.size() > 0) {
-				int new_idx = deletedIdx > 0 ? deletedIdx - 1 : 0;
-				((MenuFragment) getSupportFragmentManager()
-						.findFragmentById(R.id.credential_menu_fragment)).simulateListClick(new_idx);
+			if(mTwoPane) {
+				if(credentials.size() > 0) {
+					int new_idx = deletedIdx > 0 ? deletedIdx - 1 : 0;
+					((MenuFragment) getSupportFragmentManager()
+							.findFragmentById(R.id.credential_menu_fragment)).simulateListClick(new_idx);
+				} else {
+					InitFragment initFragment = new InitFragment();
+					getSupportFragmentManager().beginTransaction()
+							.replace(R.id.credential_detail_container, initFragment)
+							.commit();
+				}
 			} else {
-				InitFragment initFragment = new InitFragment();
-				getSupportFragmentManager().beginTransaction()
-						.replace(R.id.credential_detail_container, initFragment)
-						.commit();
+				((MenuFragment) getSupportFragmentManager()
+						.findFragmentById(R.id.credential_menu_fragment)).updateList();
 			}
 			break;
 		case CHANGE_CARD_PIN:
@@ -716,7 +734,7 @@ public class CredentialListActivity extends FragmentActivity implements
 		}
 	}
 
-	public void deleteCredential(CredentialDescription cd) {
+	public void onDeleteCredential(CredentialDescription cd) {
 		Log.i("blaat", "Delete credential called");
 		toBeDeleted = cd;
 		currentAction = Action.DELETE_CREDENTIAL;
@@ -730,5 +748,4 @@ public class CredentialListActivity extends FragmentActivity implements
 		// Returning to normal state
 		gotoState(State.NORMAL);
 	}
-
 }

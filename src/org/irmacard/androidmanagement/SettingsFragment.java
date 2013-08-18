@@ -19,6 +19,8 @@
 
 package org.irmacard.androidmanagement;
 
+import org.irmacard.credentials.util.CardVersion;
+
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -28,6 +30,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class SettingsFragment extends Fragment {
+
+	CardVersion cardVersion;
+
+	public static final String ARG_CARD_VERSION = "card_version";
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -39,6 +45,10 @@ public class SettingsFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		if(getArguments().containsKey(ARG_CARD_VERSION)) {
+			cardVersion = (CardVersion) getArguments().get(ARG_CARD_VERSION);
+		}
 	}
 	
 	@Override
@@ -55,20 +65,19 @@ public class SettingsFragment extends Fragment {
 		Button cardPINButton = (Button) view.findViewById(R.id.settings_change_card_pin_button);
 		cardPINButton.setOnClickListener(new View.OnClickListener() {
 		    public void onClick(View v){
-		    	((CredentialListActivity) getActivity()).onChangeCardPIN();;
+		    	((SettingsFragmentActivityI) getActivity()).onChangeCardPIN();;
 		    }
 		});
 
 		Button credPINButton = (Button) view.findViewById(R.id.settings_change_cred_pin_button);
 		credPINButton.setOnClickListener(new View.OnClickListener() {
 		    public void onClick(View v){
-		        ((CredentialListActivity) getActivity()).onChangeCredPIN();
+		        ((SettingsFragmentActivityI) getActivity()).onChangeCredPIN();
 		    }
 		});
 
 		TextView version_field = (TextView) view
 				.findViewById(R.id.settings_card_version_text);
-		version_field.setText(((CredentialListActivity) getActivity())
-				.getCardVersion().toString());
+		version_field.setText(cardVersion.toString());
 	}
 }

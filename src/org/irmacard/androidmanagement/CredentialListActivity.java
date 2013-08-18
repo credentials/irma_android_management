@@ -131,6 +131,9 @@ public class CredentialListActivity extends FragmentActivity implements
 	private String cardPin;
 	private CardVersion cardVersion;
 
+	// Requests
+	private int SETTINGS_REQUEST;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -339,7 +342,10 @@ public class CredentialListActivity extends FragmentActivity implements
 			// In two-pane mode, show the detail view in this activity by
 			// adding or replacing the detail fragment using a
 			// fragment transaction.
+			Bundle arguments = new Bundle();
+			arguments.putSerializable(SettingsFragment.ARG_CARD_VERSION, cardVersion);
 			SettingsFragment fragment = new SettingsFragment();
+			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.credential_detail_container, fragment)
 					.commit();
@@ -347,7 +353,19 @@ public class CredentialListActivity extends FragmentActivity implements
 		} else {
 			// In single-pane mode, simply start the detail activity
 			// for the selected item ID.
-			// FIXME: make single window version of this application
+			Intent settingsIntent = new Intent(this, SettingsActivity.class);
+			settingsIntent.putExtra(SettingsFragment.ARG_CARD_VERSION, cardVersion);
+			startActivityForResult(settingsIntent, SETTINGS_REQUEST);
+		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode == SETTINGS_REQUEST) {
+			if(resultCode == SettingsActivity.RESULT_CHANGE_CARD_PIN)
+				onChangeCardPIN();
+			else if(resultCode == SettingsActivity.RESULT_CHANGE_CRED_PIN)
+				onChangeCredPIN();
 		}
 	}
 
@@ -684,10 +702,17 @@ public class CredentialListActivity extends FragmentActivity implements
 		case CHANGE_CARD_PIN:
 			// We need to cache the new PIN now
 			cardPin = new_pin;
+
+			// Return to settings in single-pane mode
+			if(!mTwoPane)
+				onSettingsSelected();
+			break;
+		case CHANGE_CREDENTIAL_PIN:
+			if(!mTwoPane)
+				onSettingsSelected();
 			break;
 		default:
 			// Nothing to do?
-			break;
 		}
 	}
 

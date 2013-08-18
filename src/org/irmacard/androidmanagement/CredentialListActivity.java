@@ -313,15 +313,19 @@ public class CredentialListActivity extends FragmentActivity implements
 			// In two-pane mode, show the detail view in this activity by
 			// adding or replacing the detail fragment using a
 			// fragment transaction.
+			Bundle arguments = new Bundle();
+			arguments.putSerializable(LogFragment.ARG_LOG, logs);
 			LogFragment fragment = new LogFragment();
+			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.credential_detail_container, fragment)
 					.commit();
-
 		} else {
 			// In single-pane mode, simply start the detail activity
-			// for the selected item ID.
-			// FIXME: make single window version of this application
+			// for the the log
+			Intent logIntent = new Intent(this, LogActivity.class);
+			logIntent.putExtra(LogFragment.ARG_LOG, logs);
+			startActivity(logIntent);
 		}
 	}
 

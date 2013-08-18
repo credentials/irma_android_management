@@ -38,6 +38,8 @@ public class LogFragment extends Fragment {
 	private ArrayList<LogEntry> logs = null;
 	private ListView listView;
 
+	public static final String ARG_LOG = "log";
+
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
 	 * fragment (e.g. upon screen orientation changes).
@@ -45,11 +47,15 @@ public class LogFragment extends Fragment {
 	public LogFragment() {
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-	    logs = ((CredentialListActivity) getActivity()).getLogs();
+		if(getArguments().containsKey(ARG_LOG)) {
+			logs = (ArrayList<LogEntry>) getArguments().getSerializable(ARG_LOG);
+		}
+
 		if (logs == null) {
 			Log.i("blaat", "No credentials available yet");
 		} else {

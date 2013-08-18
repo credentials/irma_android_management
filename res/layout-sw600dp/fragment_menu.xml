@@ -1,0 +1,45 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <ListView
+            android:id="@+id/credential_menu_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:listSelector="@drawable/credential_list_selector"
+            android:dividerHeight="0dp"/>
+
+    <TextView
+        	android:id="@+id/credentials_menu_no_creds"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+        	android:gravity="center"
+        	android:padding="10dp"
+        	android:layout_alignParentTop="true"
+        	android:layout_centerHorizontal="true"
+        	android:text="@string/no_credentials_available"
+        	android:textColor="@color/white"
+        	android:textSize="16sp"
+        	android:textStyle="bold" />
+
+    <Button
+        	android:id="@+id/credential_menu_settings_button"
+        	android:text="@string/settings_button_text"
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:layout_alignParentLeft="true"
+        	android:layout_alignParentBottom="true"
+        	android:layout_marginBottom="30dp"
+			style="@style/MenuButton"/>
+    <Button
+        	android:id="@+id/credential_menu_log_button"
+        	android:text="@string/log_button_text"
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:layout_alignParentLeft="true"
+        	android:layout_above="@id/credential_menu_settings_button"
+        	style="@style/MenuButton"/>
+</RelativeLayout>

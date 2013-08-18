@@ -27,6 +27,7 @@ public class MenuFragment extends Fragment {
 	private ListView listView;
 	private Button log_button;
 	private Button settings_button;
+	private boolean mTwoPane;
 
 	/**
 	 * The fragment's current callback object, which is notified of list item
@@ -127,14 +128,14 @@ public class MenuFragment extends Fragment {
 		}
 
 		Log.i("menu", "Done inflating fragment layout");
+
+		mTwoPane = rootView.findViewById(R.id.credential_menu_log_button ) != null;
 		return rootView;
 	}
 	
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		listView = (ListView) view
 				.findViewById(R.id.credential_menu_list);
-		log_button = (Button) view.findViewById(R.id.credential_menu_log_button);
-		settings_button = (Button) view.findViewById(R.id.credential_menu_settings_button);
 
 		listView.setAdapter(listAdapter);
 
@@ -145,17 +146,23 @@ public class MenuFragment extends Fragment {
 		    }
 		});
 
-		log_button.setOnClickListener(new View.OnClickListener() {
-		    public void onClick(View v){
-		        clickedLogButton();
-		    }
-		});
+		if (mTwoPane) {
+			log_button = (Button) view.findViewById(R.id.credential_menu_log_button);
+			settings_button = (Button) view.findViewById(R.id.credential_menu_settings_button);
 
-		settings_button.setOnClickListener(new View.OnClickListener() {
-		    public void onClick(View v){
-		        clickedSettingsButton();
-		    }
-		});
+			log_button.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					clickedLogButton();
+				}
+			});
+			settings_button.setOnClickListener(new View.OnClickListener() {
+			    public void onClick(View v){
+			        clickedSettingsButton();
+			    }
+			});
+		}
+
+		setTwoPaneMode(mTwoPane);
 	}
 
 	@Override
@@ -172,7 +179,7 @@ public class MenuFragment extends Fragment {
 	}
 
 	/**
-	 * Turns work in two-pane mode. If this si the case, items remain
+	 * Turns work in two-pane mode. If this is the case, items remain
 	 * activitated after they have been clicked.
 	 */
 	public void setTwoPaneMode(boolean twoPane) {
@@ -206,8 +213,10 @@ public class MenuFragment extends Fragment {
 	}
 
 	private void clickedListItem(int position, View item) {
-		settings_button.setActivated(false);
-		log_button.setActivated(false);
+		if(mTwoPane) {
+			settings_button.setActivated(false);
+			log_button.setActivated(false);
+		}
 		mCallbacks.onItemSelected(credentials.get(position).getCredentialDescription().getId());
 	}
 }

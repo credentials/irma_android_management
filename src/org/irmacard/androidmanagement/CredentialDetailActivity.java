@@ -19,6 +19,8 @@
 
 package org.irmacard.androidmanagement;
 
+import org.irmacard.android.util.credentials.CredentialPackage;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -35,6 +37,7 @@ import android.view.MenuItem;
  * a {@link CredentialDetailFragment}.
  */
 public class CredentialDetailActivity extends FragmentActivity {
+	CredentialPackage credential;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +45,7 @@ public class CredentialDetailActivity extends FragmentActivity {
 		setContentView(R.layout.activity_credential_detail);
 
 		// Show the Up button in the action bar.
-		if(getActionBar() != null) {
-			// TODO: workaround for now, figure out what is really going on here.
-			getActionBar().setDisplayHomeAsUpEnabled(true);
-		}
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// savedInstanceState is non-null when there is fragment state
 		// saved from previous configurations of this activity
@@ -59,15 +59,16 @@ public class CredentialDetailActivity extends FragmentActivity {
 		if (savedInstanceState == null) {
 			// Create the detail fragment and add it to the activity
 			// using a fragment transaction.
+			credential = (CredentialPackage) getIntent().getSerializableExtra(
+					CredentialDetailFragment.ARG_ITEM);
 			Bundle arguments = new Bundle();
-			arguments.putSerializable(
-					CredentialDetailFragment.ARG_ITEM,
-					getIntent().getSerializableExtra(
-							CredentialDetailFragment.ARG_ITEM));
+			arguments.putSerializable(CredentialDetailFragment.ARG_ITEM,
+					credential);
 			CredentialDetailFragment fragment = new CredentialDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
 					.add(R.id.credential_detail_container, fragment).commit();
+			getActionBar().setTitle(credential.getCredentialDescription().getName());
 		}
 	}
 

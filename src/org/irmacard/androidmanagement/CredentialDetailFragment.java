@@ -32,7 +32,9 @@ import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.info.AttributeDescription;
 import org.irmacard.credentials.info.IssuerDescription;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -41,6 +43,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -60,6 +63,8 @@ public class CredentialDetailFragment extends Fragment {
 	CredentialAttributeAdapter mAdapter;
 	CredentialPackage credential;
 	AndroidWalker aw;
+
+	private LayoutInflater inflater;
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -85,18 +90,13 @@ public class CredentialDetailFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.fragment_credential_detail,
 				container, false);
 
-		if (credential != null) {
-			List<AttributeDescription> attr_desc = credential.getCredentialDescription().getAttributes();
-			Attributes attr_vals = credential.getAttributes();
-			mAdapter = new CredentialAttributeAdapter(getActivity(), attr_desc,
-					attr_vals);
-		}
+		this.inflater = inflater;
 
 		return rootView;
 	}
 	
 	public void onViewCreated(View view, Bundle savedInstanceState) {
-		ListView list = (ListView) view
+		LinearLayout list = (LinearLayout) view
 				.findViewById(R.id.detail_attribute_list);
 		
 		TextView issuerName = (TextView) view.findViewById(R.id.detail_issuer_description_name);
@@ -113,6 +113,23 @@ public class CredentialDetailFragment extends Fragment {
 		issuerAddress.setText(issuer.getContactAddress());
 		issuerEMail.setText(issuer.getContactEMail());
 		
+		// This is not so nice, rather used a Listview here, but it is not possible
+		// to easily make it not scrollable and show all the items.
+		List<AttributeDescription> attr_desc = credential.getCredentialDescription().getAttributes();
+		Attributes attr_vals = credential.getAttributes();
+		for (int position = 0; position < attr_desc.size(); position++) {
+			View attributeView = inflater.inflate(R.layout.row_attribute, null);
+
+			TextView name = (TextView) attributeView.findViewById(R.id.detail_attribute_name);
+			TextView value = (TextView) attributeView.findViewById(R.id.detail_attribute_value);
+
+			AttributeDescription desc = attr_desc.get(position);
+			name.setText(desc.getName() + ":");
+			value.setText(new String(attr_vals.get(desc.getName())));
+
+			list.addView(attributeView);
+		}
+
 		// Display expiry
 		if (credential.getAttributes().isValid()) {
 			DateFormat sdf = SimpleDateFormat.getDateInstance(DateFormat.LONG);
@@ -148,8 +165,6 @@ public class CredentialDetailFragment extends Fragment {
 		        clickedDeleteButton();
 		    }
 		});
-
-		list.setAdapter(mAdapter);
 	}
 
 	private void clickedDeleteButton() {

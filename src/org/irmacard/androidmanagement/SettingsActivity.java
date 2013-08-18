@@ -31,7 +31,7 @@ import android.support.v4.app.FragmentActivity;
  * This activity is mostly just a 'shell' activity containing nothing more than
  * a {@link CredentialDetailFragment}.
  */
-public class SettingsActivity extends FragmentActivity implements SettingsFragmentActivityI {
+public class SettingsActivity extends FragmentActivity implements SettingsFragment.Callbacks {
 	
 	public static final int RESULT_CHANGE_CARD_PIN = RESULT_FIRST_USER;
 	public static final int RESULT_CHANGE_CRED_PIN = RESULT_FIRST_USER + 1;

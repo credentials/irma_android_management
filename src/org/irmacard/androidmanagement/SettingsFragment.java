@@ -34,6 +34,11 @@ public class SettingsFragment extends Fragment {
 	CardVersion cardVersion;
 
 	public static final String ARG_CARD_VERSION = "card_version";
+	
+	public interface Callbacks {
+		public void onChangeCardPIN();
+		public void onChangeCredPIN();
+	}
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -65,14 +70,14 @@ public class SettingsFragment extends Fragment {
 		Button cardPINButton = (Button) view.findViewById(R.id.settings_change_card_pin_button);
 		cardPINButton.setOnClickListener(new View.OnClickListener() {
 		    public void onClick(View v){
-		    	((SettingsFragmentActivityI) getActivity()).onChangeCardPIN();;
+		    	((Callbacks) getActivity()).onChangeCardPIN();;
 		    }
 		});
 
 		Button credPINButton = (Button) view.findViewById(R.id.settings_change_cred_pin_button);
 		credPINButton.setOnClickListener(new View.OnClickListener() {
 		    public void onClick(View v){
-		        ((SettingsFragmentActivityI) getActivity()).onChangeCredPIN();
+		        ((Callbacks) getActivity()).onChangeCredPIN();
 		    }
 		});
 

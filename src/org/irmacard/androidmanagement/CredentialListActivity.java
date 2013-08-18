@@ -74,7 +74,8 @@ public class CredentialListActivity extends FragmentActivity implements
 		CardMissingDialogFragment.CardMissingDialogListener,
 		ChangePinDialogFragment.ChangePinDialogListener,
 		AlertDialogFragment.AlertDialogListener,
-		CredentialDetailFragment.Callbacks {
+		CredentialDetailFragment.Callbacks,
+		SettingsFragment.Callbacks {
 
 	/**
 	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet

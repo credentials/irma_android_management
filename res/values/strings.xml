@@ -3,6 +3,7 @@
 
     <string name="app_name">IRMA Management</string>
     <string name="title_credential_detail">Credential Detail</string>
+    <string name="title_log">Log</string>
     <string name="irmalogo">IRMA Logo</string>
     <string name="irmashape">GUI artifact</string>
     <string name="issuerlogo">Issuer Logo</string>

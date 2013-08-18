@@ -21,7 +21,6 @@ package org.irmacard.androidmanagement;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -56,6 +55,7 @@ public class CredentialDetailFragment extends Fragment {
 	 * represents.
 	 */
 	public static final String ARG_ITEM_ID = "item_id";
+	public static final String ARG_ITEM = "item";
 	
 	CredentialAttributeAdapter mAdapter;
 	CredentialPackage credential;
@@ -72,20 +72,8 @@ public class CredentialDetailFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (getArguments().containsKey(ARG_ITEM_ID)) {
-			// FIXME: this will not work in single screen mode
-			ArrayList<CredentialPackage> credentials = ((CredentialListActivity) getActivity())
-					.getCredentials();
-			
-			short cred_id = getArguments().getShort(
-					CredentialDetailFragment.ARG_ITEM_ID);
-			
-			credential = null;
-			for(CredentialPackage cp : credentials) {
-				if(cp.getCredentialDescription().getId() == cred_id) {
-					credential = cp;
-				}
-			}
+		if (getArguments().containsKey(ARG_ITEM)) {
+			credential = (CredentialPackage) getArguments().getSerializable(ARG_ITEM);
 		}
 		
 		aw = new AndroidWalker(getResources().getAssets());

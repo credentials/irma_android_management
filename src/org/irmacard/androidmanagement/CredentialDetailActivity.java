@@ -42,7 +42,10 @@ public class CredentialDetailActivity extends FragmentActivity {
 		setContentView(R.layout.activity_credential_detail);
 
 		// Show the Up button in the action bar.
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+		if(getActionBar() != null) {
+			// TODO: workaround for now, figure out what is really going on here.
+			getActionBar().setDisplayHomeAsUpEnabled(true);
+		}
 
 		// savedInstanceState is non-null when there is fragment state
 		// saved from previous configurations of this activity
@@ -57,10 +60,10 @@ public class CredentialDetailActivity extends FragmentActivity {
 			// Create the detail fragment and add it to the activity
 			// using a fragment transaction.
 			Bundle arguments = new Bundle();
-			arguments.putString(
-					CredentialDetailFragment.ARG_ITEM_ID,
-					getIntent().getStringExtra(
-							CredentialDetailFragment.ARG_ITEM_ID));
+			arguments.putSerializable(
+					CredentialDetailFragment.ARG_ITEM,
+					getIntent().getSerializableExtra(
+							CredentialDetailFragment.ARG_ITEM));
 			CredentialDetailFragment fragment = new CredentialDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()

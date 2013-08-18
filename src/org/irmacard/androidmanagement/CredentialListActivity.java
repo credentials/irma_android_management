@@ -273,12 +273,19 @@ public class CredentialListActivity extends FragmentActivity implements
 	 */
 	@Override
 	public void onItemSelected(short id) {
+		CredentialPackage credential = null;
+		for(CredentialPackage cp : credentials) {
+			if(cp.getCredentialDescription().getId() == id) {
+				credential = cp;
+			}
+		}
+
 		if (mTwoPane) {
 			// In two-pane mode, show the detail view in this activity by
 			// adding or replacing the detail fragment using a
 			// fragment transaction.
 			Bundle arguments = new Bundle();
-			arguments.putShort(CredentialDetailFragment.ARG_ITEM_ID, id);
+			arguments.putSerializable(CredentialDetailFragment.ARG_ITEM, credential);
 			CredentialDetailFragment fragment = new CredentialDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
@@ -288,9 +295,10 @@ public class CredentialListActivity extends FragmentActivity implements
 		} else {
 			// In single-pane mode, simply start the detail activity
 			// for the selected item ID.
+			Log.i(TAG, "Starting detail activity");
 			Intent detailIntent = new Intent(this,
 					CredentialDetailActivity.class);
-			detailIntent.putExtra(CredentialDetailFragment.ARG_ITEM_ID, id);
+			detailIntent.putExtra(CredentialDetailFragment.ARG_ITEM, credential);
 			startActivity(detailIntent);
 		}
 	}

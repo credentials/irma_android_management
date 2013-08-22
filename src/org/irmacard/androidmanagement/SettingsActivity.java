@@ -21,6 +21,8 @@ package org.irmacard.androidmanagement;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.view.MenuItem;
 
 /**
  * An activity representing a single Credential detail screen. This activity is
@@ -42,10 +44,7 @@ public class SettingsActivity extends FragmentActivity implements SettingsFragme
 		setContentView(R.layout.activity_settings);
 
 		// Show the Up button in the action bar.
-		if(getActionBar() != null) {
-			// TODO: workaround for now, figure out what is really going on here.
-			getActionBar().setDisplayHomeAsUpEnabled(true);
-		}
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// savedInstanceState is non-null when there is fragment state
 		// saved from previous configurations of this activity
@@ -83,6 +82,16 @@ public class SettingsActivity extends FragmentActivity implements SettingsFragme
 		finish();
 	}
 
-	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			Log.i("SettingsActivity", "Up button pressed, returning");
+			finish();
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
 	
 }

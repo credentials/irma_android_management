@@ -18,13 +18,21 @@ public class ChangePinDialogFragment extends DialogFragment {
 	private static final String EXTRA_PIN_NAME = "AndroidManagement.ChangePinDialog.pinname";
 	private static final String EXTRA_TRIES = "AndroidManagement.ChangePinDialog.tries";
 	private static final String EXTRA_NEW_PIN = "AndroidManagement.ChangePinDialog.new_pin";
+	private static final String EXTRA_PIN_LENGTH = "AndroidManagement.ChangePinDialog.pinLength";
 
 	private String pinName;
 	private int tries;
 	private String newPin;
+	private int pinLength;
 
     private Boolean canceled;
-    private Boolean error = false;
+
+    private static enum Error {
+    	NONE,
+    	PINS_NOT_EQUAL,
+    	PIN_LENGTH_WRONG
+    }
+    private Error error = Error.NONE;
     
     private EditText old_pin_field;
     private EditText new_pin_field;
@@ -38,13 +46,14 @@ public class ChangePinDialogFragment extends DialogFragment {
 	
 	ChangePinDialogListener mListener;
 	
-	public static ChangePinDialogFragment getInstance(String pinName, int tries, String new_pin) {
+	public static ChangePinDialogFragment getInstance(String pinName, int tries, String new_pin, int pinLength) {
         ChangePinDialogFragment f = new ChangePinDialogFragment();
 
         Bundle args = new Bundle();
         args.putString(EXTRA_PIN_NAME, pinName);
         args.putInt(EXTRA_TRIES, tries);
         args.putString(EXTRA_NEW_PIN, new_pin);
+        args.putInt(EXTRA_PIN_LENGTH, pinLength);
         f.setArguments(args);
 
         return f;
@@ -57,6 +66,7 @@ public class ChangePinDialogFragment extends DialogFragment {
 		pinName = getArguments().getString(EXTRA_PIN_NAME);
 		tries = getArguments().getInt(EXTRA_TRIES);
 		newPin = getArguments().getString(EXTRA_NEW_PIN);
+		pinLength = getArguments().getInt(EXTRA_PIN_LENGTH);
 		
 		Log.i("Blaat", "Tries: " + tries);
     }
@@ -84,13 +94,19 @@ public class ChangePinDialogFragment extends DialogFragment {
         new_pin_again_field = (EditText) dialogView.findViewById(R.id.new_pin_code_again);
         error_field = (TextView) dialogView.findViewById(R.id.changepin_error);
         
-        if(error || tries != -1) {
+        if(error != Error.NONE || tries != -1) {
         	error_field.setVisibility(View.VISIBLE);
 
-        	if(error) {
+        	switch(error) {
+        	case PINS_NOT_EQUAL:
         		error_field.setText(R.string.pins_unequal);
-        	} else {
-				// Report number of tries
+        		break;
+			case PIN_LENGTH_WRONG:
+				error_field.setText(String.format(getResources().getString(
+						R.string.pin_length_wrong, pinLength)));
+				break;
+        	case NONE:
+        		// Then report number of tries
 				error_field.setText(String.format(
 						getResources().getString(R.string.change_pin_tries),
 						tries));
@@ -138,11 +154,14 @@ public class ChangePinDialogFragment extends DialogFragment {
         	String new_pin = new_pin_field.getText().toString();
         	String new_pin_again = new_pin_again_field.getText().toString();
         	
-        	if(new_pin.equals(new_pin_again)) {
-        		mListener.onPINChange(old_pin, new_pin);
-        	} else {
-        		error = true;
+        	if(!new_pin.equals(new_pin_again)) {
+        		error = Error.PINS_NOT_EQUAL;
         		show(getFragmentManager(), getTag());
+        	} else if(new_pin.length() != pinLength) {
+        		error = Error.PIN_LENGTH_WRONG;
+        		show(getFragmentManager(), getTag());
+        	} else {
+        		mListener.onPINChange(old_pin, new_pin);
         	}
         }
     }

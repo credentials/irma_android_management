@@ -137,6 +137,10 @@ public class CredentialListActivity extends FragmentActivity implements
 	private int SETTINGS_REQUEST = 11;
 	private int DETAIL_REQUEST = 12;
 
+	// PIN lengths
+	private int CRED_PIN_LENGTH = 4;
+	private int CARD_PIN_LENGTH = 6;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -446,11 +450,13 @@ public class CredentialListActivity extends FragmentActivity implements
 				confirmDialog.show(getFragmentManager(), "confirm_delete");
 				break;
 			case CHANGE_CARD_PIN:
-				pinDialog = ChangePinDialogFragment.getInstance("card", tries, new_pin);
+				pinDialog = ChangePinDialogFragment.getInstance("card", tries,
+						new_pin, CARD_PIN_LENGTH);
 				pinDialog.show(getFragmentManager(), "change_card_pin");
 				break;
 			case CHANGE_CREDENTIAL_PIN:
-				pinDialog = ChangePinDialogFragment.getInstance("credential", tries, new_pin);
+				pinDialog = ChangePinDialogFragment.getInstance("credential",
+						tries, new_pin, CRED_PIN_LENGTH);
 				pinDialog.show(getFragmentManager(), "change_cred_pin");
 				break;
 			case NONE:

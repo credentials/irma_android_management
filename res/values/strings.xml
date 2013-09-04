@@ -35,6 +35,7 @@
     <string name="new_pin_again_message">Retype New PIN:</string>
 
     <string name="pins_unequal">New PINs do not match. Please try again.</string>
+    <string name="pin_length_wrong">New PIN must be %1$d digits long. Please try again.</string>
 
     <string name="change_pin_tries">Pin Incorrect! You have %1$d tries left.</string>
 

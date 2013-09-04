@@ -42,6 +42,7 @@
     <string name="settings_button_text">Settings</string>
     <string name="menu_heading_credentials">Credentials on card:</string>
     <string name="no_logs_available">no log items found</string>
+    <string name="error_logs_not_read">log could not be read</string>
     <string name="no_credentials_available">no credentials found</string>
     <string name="init_text">Please select a credential on the left, go to your Logs, or modify the Settings on your card.</string>
     <string name="card_pin_heading">Maintenance Pin</string>

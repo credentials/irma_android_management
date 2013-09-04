@@ -76,9 +76,12 @@ public class LogFragment extends Fragment {
 		ListView list = (ListView) rootView.findViewById(R.id.log_list);
 		TextView no_items = (TextView) rootView.findViewById(R.id.log_no_log);
 
-		if(logs.isEmpty()) {
+		if(logs == null || logs.isEmpty()) {
 			list.setVisibility(View.INVISIBLE);
 			no_items.setVisibility(View.VISIBLE);
+			if(logs == null) {
+				no_items.setText(R.string.error_logs_not_read);
+			}
 		} else {
 			list.setVisibility(View.VISIBLE);
 			no_items.setVisibility(View.INVISIBLE);

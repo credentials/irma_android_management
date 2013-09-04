@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sourceforge.scuba.smartcards.CardServiceException;
 import net.sourceforge.scuba.smartcards.IsoDepCardService;
 
 import org.irmacard.android.util.credentials.AndroidWalker;
@@ -252,6 +253,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 		protected CardData doInBackground(IsoDep... arg0) {
 			ArrayList<CredentialPackage> credentialpks = new ArrayList<CredentialPackage>();
 			ArrayList<LogEntry> logs = new ArrayList<LogEntry>();
+			boolean credentialsRead = false;
 			CardVersion cardVersion = null;
 
 			IsoDep tag = arg0[0];
@@ -280,6 +282,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 					Log.i(TAG, "With attributes: " + attr);
 					credentialpks.add(new CredentialPackage(cd, attr));
 				}
+				credentialsRead = true;
 
 				Log.i(TAG,"Retrieving logs now");
 				for(LogEntry l : ic.getLog()) {
@@ -289,6 +292,15 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 				is.close();
 				
 				Log.i(TAG, "All attributes read!");
+			} catch (CardServiceException e) {
+				Log.e(TAG, "CardServiceException caught");
+				e.printStackTrace();
+				if(credentialsRead) {
+					Log.e(TAG, "Continuing as credentials were read");
+					logs = null;
+				} else {
+					return new CardData(e);
+				}
 			} catch (Exception e) {
 				Log.e(TAG, "Reading verification caused exception");
 				e.printStackTrace();

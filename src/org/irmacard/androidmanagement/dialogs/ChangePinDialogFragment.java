@@ -8,11 +8,14 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 public class ChangePinDialogFragment extends DialogFragment {
 	private static final String EXTRA_PIN_NAME = "AndroidManagement.ChangePinDialog.pinname";
@@ -45,6 +48,7 @@ public class ChangePinDialogFragment extends DialogFragment {
 	}
 	
 	ChangePinDialogListener mListener;
+	private AlertDialog dialog;
 	
 	public static ChangePinDialogFragment getInstance(String pinName, int tries, String new_pin, int pinLength) {
         ChangePinDialogFragment f = new ChangePinDialogFragment();
@@ -86,7 +90,7 @@ public class ChangePinDialogFragment extends DialogFragment {
 					}
 				});
         // Create the AlertDialog object and return it
-        Dialog dialog = builder.create();
+        dialog = builder.create();
         
         Log.i("Blaat", "On create called, error state is " + error.toString());
         old_pin_field = (EditText) dialogView.findViewById(R.id.old_pincode);
@@ -122,6 +126,17 @@ public class ChangePinDialogFragment extends DialogFragment {
         dialog.getWindow().setSoftInputMode (WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         old_pin_field.requestFocus();
         
+        new_pin_again_field.setOnEditorActionListener(new OnEditorActionListener() {
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
+						|| (actionId == EditorInfo.IME_ACTION_DONE)) {
+					dismissDialog();
+				}
+				return false;
+            }
+        });
+
         return dialog;
     }
     
@@ -164,5 +179,9 @@ public class ChangePinDialogFragment extends DialogFragment {
         		mListener.onPINChange(old_pin, new_pin);
         	}
         }
+    }
+
+    private void dismissDialog() {
+    	dialog.dismiss();
     }
 }

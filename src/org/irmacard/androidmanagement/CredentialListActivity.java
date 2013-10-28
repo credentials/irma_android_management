@@ -670,7 +670,7 @@ public class CredentialListActivity extends FragmentActivity implements
 				@Override
 				public TransmitResult run(IdemixService is) throws CardServiceException {
 					is.sendCardPin(cardPin.getBytes());
-					int tries = is.updateCredentialPin(old_pin.getBytes(), new_pin.getBytes());
+					int tries = is.updateCredentialPin(new_pin.getBytes());
 					if (tries == -1) {
 						return new TransmitResult(TransmitResult.Result.SUCCESS);
 					} else {

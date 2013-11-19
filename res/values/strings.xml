@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">IRMA Management</string>
+    <string name="app_name">IRMA (pilot) Management</string>
     <string name="title_credential_detail">Credential Detail</string>
     <string name="title_log">Log</string>
     <string name="title_settings">Settings</string>

@@ -19,6 +19,8 @@
 
 package org.irmacard.androidmanagement;
 
+import org.irmacard.pilot.androidmanagement.R;
+
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;

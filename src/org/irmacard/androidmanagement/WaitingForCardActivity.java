@@ -39,6 +39,7 @@ import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.util.CardVersion;
 import org.irmacard.credentials.util.log.LogEntry;
 import org.irmacard.idemix.IdemixService;
+import org.irmacard.pilot.androidmanagement.R;
 
 import android.app.Activity;
 import android.app.DialogFragment;

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import org.irmacard.androidmanagement.adapters.LogListAdapter;
 import org.irmacard.credentials.util.log.LogEntry;
+import org.irmacard.pilot.androidmanagement.R;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;

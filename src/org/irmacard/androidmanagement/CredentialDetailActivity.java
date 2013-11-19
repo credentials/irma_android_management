@@ -21,6 +21,7 @@ package org.irmacard.androidmanagement;
 
 import org.irmacard.android.util.credentials.CredentialPackage;
 import org.irmacard.credentials.info.CredentialDescription;
+import org.irmacard.pilot.androidmanagement.R;
 
 import android.content.Intent;
 import android.os.Bundle;

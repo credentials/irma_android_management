@@ -21,7 +21,7 @@ package org.irmacard.androidmanagement.adapters;
 
 import java.util.List;
 
-import org.irmacard.androidmanagement.R;
+import org.irmacard.pilot.androidmanagement.R;
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.info.AttributeDescription;
 

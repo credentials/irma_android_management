@@ -34,10 +34,11 @@ import org.irmacard.androidmanagement.dialogs.ConfirmDeleteDialogFragment.Confir
 import org.irmacard.androidmanagement.util.TransmitResult;
 import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.info.CredentialDescription;
-
 import org.irmacard.credentials.util.CardVersion;
 import org.irmacard.credentials.util.log.LogEntry;
 import org.irmacard.idemix.IdemixService;
+import org.irmacard.pilot.androidmanagement.R;
+
 import android.app.DialogFragment;
 import android.app.PendingIntent;
 import android.content.Context;

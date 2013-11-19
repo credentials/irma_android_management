@@ -32,6 +32,7 @@ import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.info.AttributeDescription;
 import org.irmacard.credentials.info.CredentialDescription;
 import org.irmacard.credentials.info.IssuerDescription;
+import org.irmacard.pilot.androidmanagement.R;
 
 import android.app.Activity;
 import android.graphics.Bitmap;

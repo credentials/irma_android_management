@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import org.irmacard.demo.androidmanagement.R;
 
 public class InitFragment extends Fragment {	
 	/**

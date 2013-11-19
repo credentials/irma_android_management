@@ -22,10 +22,8 @@ package org.irmacard.androidmanagement;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import net.sourceforge.scuba.smartcards.CardServiceException;
 import net.sourceforge.scuba.smartcards.IsoDepCardService;
-
 import org.irmacard.android.util.credentials.AndroidWalker;
 import org.irmacard.android.util.credentials.CredentialPackage;
 import org.irmacard.android.util.pindialog.EnterPINDialogFragment;
@@ -38,8 +36,8 @@ import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.util.CardVersion;
 import org.irmacard.credentials.util.log.LogEntry;
+import org.irmacard.demo.androidmanagement.R;
 import org.irmacard.idemix.IdemixService;
-
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.PendingIntent;

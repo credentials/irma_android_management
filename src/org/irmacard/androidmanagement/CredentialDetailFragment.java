@@ -24,7 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
 import org.irmacard.android.util.credentials.AndroidWalker;
 import org.irmacard.android.util.credentials.CredentialPackage;
 import org.irmacard.androidmanagement.adapters.CredentialAttributeAdapter;
@@ -32,7 +31,7 @@ import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.info.AttributeDescription;
 import org.irmacard.credentials.info.CredentialDescription;
 import org.irmacard.credentials.info.IssuerDescription;
-
+import org.irmacard.demo.androidmanagement.R;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;

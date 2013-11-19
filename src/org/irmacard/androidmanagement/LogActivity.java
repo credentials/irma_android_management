@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import org.irmacard.demo.androidmanagement.R;
 
 /**
  * An activity representing a single Credential detail screen. This activity is

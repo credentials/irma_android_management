@@ -20,7 +20,7 @@
 package org.irmacard.androidmanagement;
 
 import org.irmacard.credentials.util.CardVersion;
-
+import org.irmacard.demo.androidmanagement.R;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;

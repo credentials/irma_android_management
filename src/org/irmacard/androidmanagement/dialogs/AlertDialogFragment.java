@@ -19,7 +19,7 @@
 
 package org.irmacard.androidmanagement.dialogs;
 
-import org.irmacard.androidmanagement.R;
+import org.irmacard.demo.androidmanagement.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;

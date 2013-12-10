@@ -313,7 +313,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 		
 		@Override
 		protected void onPostExecute(CardData data) {
-			setState(STATE_IDLE);
+			setState(STATE_DISPLAYING);
 			
 			if(data.isSuccesful()) {
 				// Move to CredentialListActivity

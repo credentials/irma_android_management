@@ -350,7 +350,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 
 	@Override
 	public void onPINEntry(String pincode) {
-		Log.i(TAG, "Pin entered " + pincode);
+		//Log.i(TAG, "Pin entered " + pincode);
 		setState(STATE_CHECKING);
 		new LoadCredentialsFromCardTask(this, pincode).execute(isotag);
 	}

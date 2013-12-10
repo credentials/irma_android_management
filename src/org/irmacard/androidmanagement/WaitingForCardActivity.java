@@ -158,9 +158,6 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
     @Override
     public void onResume() {
         super.onResume();
-        if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(getIntent().getAction())) {
-            processIntent(getIntent());
-        }        
         if (nfcA != null) {
         	nfcA.enableForegroundDispatch(this, mPendingIntent, mFilters, mTechLists);
         }
@@ -171,24 +168,6 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
     	super.onPause();
     	if (nfcA != null) {
     		nfcA.disableForegroundDispatch(this);
-    	}
-    }
-    
-    public void processIntent(Intent intent) {
-        tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-    	isotag = IsoDep.get(tag);
-    	if (isotag != null) {
-    		Log.i(TAG,"Found IsoDep tag!");
-    		
-    		// Make sure we're not already communicating with a card
-    		if (activityState == STATE_IDLE) {
-    			askForPin();
-    		}
-    		
-        	if (activityState == STATE_DISPLAYING) {
-        		// Return to default state
-        		setState(STATE_IDLE);
-        	}
     	}
     }
     
@@ -236,7 +215,17 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
     @Override
     public void onNewIntent(Intent intent) {
         Log.i(TAG, "Discovered tag with intent: " + intent);
-        setIntent(intent);
+        
+        tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+    	isotag = IsoDep.get(tag);
+    	if (isotag != null) {
+    		Log.i(TAG,"Found IsoDep tag!");
+    		
+    		// Make sure we're not already communicating with a card
+    		if (activityState == STATE_IDLE) {
+    			askForPin();
+    		}
+    	}
     }
     
     private class LoadCredentialsFromCardTask extends AsyncTask<IsoDep, Void, CardData> {
@@ -319,7 +308,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 		
 		@Override
 		protected void onPostExecute(CardData data) {
-			activityState = STATE_DISPLAYING;
+			setState(STATE_IDLE);
 			
 			if(data.isSuccesful()) {
 				// Move to CredentialListActivity

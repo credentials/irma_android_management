@@ -146,6 +146,10 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
         
         // Set initial state
         setState(STATE_IDLE);
+        
+        if(getIntent() != null) {
+        	onNewIntent(getIntent());
+        }
 	}
 
 	@Override
@@ -215,17 +219,18 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
     @Override
     public void onNewIntent(Intent intent) {
         Log.i(TAG, "Discovered tag with intent: " + intent);
-        
-        tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-    	isotag = IsoDep.get(tag);
-    	if (isotag != null) {
-    		Log.i(TAG,"Found IsoDep tag!");
-    		
-    		// Make sure we're not already communicating with a card
-    		if (activityState == STATE_IDLE) {
-    			askForPin();
-    		}
-    	}
+        if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())) {
+	        tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+	    	isotag = IsoDep.get(tag);
+	    	if (isotag != null) {
+	    		Log.i(TAG,"Found IsoDep tag!");
+	    		
+	    		// Make sure we're not already communicating with a card
+	    		if (activityState == STATE_IDLE) {
+	    			askForPin();
+	    		}
+	    	}
+        }
     }
     
     private class LoadCredentialsFromCardTask extends AsyncTask<IsoDep, Void, CardData> {

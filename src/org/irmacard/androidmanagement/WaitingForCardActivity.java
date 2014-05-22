@@ -165,6 +165,9 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
         if (nfcA != null) {
         	nfcA.enableForegroundDispatch(this, mPendingIntent, mFilters, mTechLists);
         }
+        if (activityState == STATE_DISPLAYING) {
+        	setState(STATE_IDLE);
+        }
     }
     
     @Override
@@ -313,7 +316,7 @@ public class WaitingForCardActivity extends Activity implements EnterPINDialogFr
 		
 		@Override
 		protected void onPostExecute(CardData data) {
-			setState(STATE_DISPLAYING);
+			activityState = STATE_DISPLAYING;
 			
 			if(data.isSuccesful()) {
 				// Move to CredentialListActivity

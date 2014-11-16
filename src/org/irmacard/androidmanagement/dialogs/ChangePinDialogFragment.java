@@ -106,8 +106,8 @@ public class ChangePinDialogFragment extends DialogFragment {
         		error_field.setText(R.string.pins_unequal);
         		break;
 			case PIN_LENGTH_WRONG:
-				error_field.setText(String.format(getResources().getString(
-						R.string.pin_length_wrong, pinLength)));
+				error_field.setText(getResources().getString(
+						R.string.pin_length_wrong, pinLength));
 				break;
         	case NONE:
         		// Then report number of tries

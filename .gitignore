@@ -2,3 +2,7 @@ bin/
 gen/
 assets/irma_configuration
 *.apk
+.gradle/
+build/
+.settings/
+lint.xml

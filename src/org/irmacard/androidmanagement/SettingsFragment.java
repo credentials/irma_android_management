@@ -19,7 +19,7 @@
 
 package org.irmacard.androidmanagement;
 
-import org.irmacard.credentials.util.CardVersion;
+import org.irmacard.idemix.util.CardVersion;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;

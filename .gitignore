@@ -6,3 +6,5 @@ assets/irma_configuration
 build/
 .settings/
 lint.xml
+.idea/
+*.iml

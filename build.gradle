@@ -9,7 +9,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.13.0'
+        classpath 'com.android.tools.build:gradle:1.1.1'
     }
 }
 
@@ -44,13 +44,12 @@ android {
 
 dependencies {
     compile 'com.android.support:support-v4:19.1.0'
-
-    compile "org.irmacard.android:irma_android_library:0.8"
-    compile 'net.sourceforge.scuba:scuba_sc_android:0.0.3'
-    
-    compile 'net.sourceforge.scuba:scuba_smartcards:0.0.3'
+    compile 'org.irmacard.android:irma_android_library:0.9.1'
+    compile 'net.sf.scuba:scuba_sc_android:0.0.7-irma'
+    compile 'net.sf.scuba:scuba_smartcards:0.0.7-irma'
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.1'
+    gradleVersion = '2.2'
 }
+

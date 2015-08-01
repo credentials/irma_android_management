@@ -26,6 +26,8 @@ import net.sf.scuba.smartcards.CardServiceException;
 import net.sf.scuba.smartcards.IsoDepCardService;
 
 import org.irmacard.android.util.credentials.CredentialPackage;
+import org.irmacard.android.util.credentialdetails.*;
+
 import org.irmacard.androidmanagement.dialogs.AlertDialogFragment;
 import org.irmacard.androidmanagement.dialogs.CardMissingDialogFragment;
 import org.irmacard.androidmanagement.dialogs.ChangePinDialogFragment;

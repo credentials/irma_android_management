@@ -40,7 +40,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.irmacard.androidmanagement.LogActivity"
+            android:name="org.irmacard.android.util.cardlog.LogActivity"
             android:hardwareAccelerated="false"
             android:label="@string/title_log"
             android:screenOrientation="portrait" >

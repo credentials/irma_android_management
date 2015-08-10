@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import net.sf.scuba.smartcards.CardServiceException;
 import net.sf.scuba.smartcards.IsoDepCardService;
 
+import org.irmacard.android.util.cardlog.LogActivity;
+import org.irmacard.android.util.cardlog.LogFragment;
 import org.irmacard.android.util.credentials.CredentialPackage;
 import org.irmacard.android.util.credentialdetails.*;
 
